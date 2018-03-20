@@ -1,0 +1,48 @@
+INSTALL
+-------
+
+Install ERP USERSIDE under Docker:
+
+  sudo make install
+
+
+
+MAINTANCE
+---------
+
+Stop USERSIDE Environment Docker stack:
+
+  sudo make stop
+
+Start USERSIDE Environment Docker stack:
+
+  sudo make up
+
+Stop and remove USERSIDE Environment containers:
+
+  sudo make down
+
+Open PSQL tool (PostgreSQL client tool):
+
+  sudo make psql
+
+Run USERSIDE INSTALL TOOL:
+
+  sudo make us-install
+
+Run cron manually:
+
+  sudo make us-cron
+
+Run backup manually:
+
+  sudo make us-backup
+
+
+
+UNINSTALL
+---------
+
+For full uninstall USERSIDE Environment Docker stack:
+
+  sudo make uninstall

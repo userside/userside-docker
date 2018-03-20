@@ -1,0 +1,63 @@
+version: '3'
+
+services:
+  postgres:
+    image: erpuserside/postgres:3.0
+    restart: always
+    environment:
+      LANG: ru_RU.UTF-8
+      TZ: 'Europe/Zaporozhye'
+      POSTGRES_DB: userside
+      POSTGRES_USER: userside
+      POSTGRES_PASSWORD: userside
+    volumes:
+      - /var/lib/postgresql/data
+      - backup:/backup
+    networks:
+      - internal
+
+  fpm:
+    depends_on:
+      - postgres
+    image: erpuserside/fpm:3.12
+    restart: always
+    environment:
+      TZ: 'Europe/Zaporozhye'
+    volumes:
+      - www:/app/userside
+      - backup:/backup
+    networks:
+      - internal
+
+  nginx:
+    depends_on:
+      - fpm
+    image: erpuserside/nginx:3.0
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - www:/app/userside
+      - /var/log/userside/nginx:/app/log
+    networks:
+      - internal
+
+volumes:
+  www:
+    driver_opts:
+      type: none
+      device: /opt/userside
+      o: bind
+  backup:
+    driver_opts:
+      type: none
+      device: /opt/backup
+      o: bind
+
+networks:
+  internal:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.31.0.0/28
