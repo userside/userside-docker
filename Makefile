@@ -14,7 +14,7 @@ down:
 pull:
 	docker-compose -p userside pull
 
-update: us-backup stop pull install
+update: backup stop pull install
 
 uninstall: down
 	docker volume prune -f
@@ -30,7 +30,7 @@ backup:
 	docker-compose -p userside exec fpm /app/backup.sh
 
 dbrestore:
-	docker-compose -p userside exec postgres /app/restore.sh ${ARGS}
+	docker-compose -p userside exec postgres /app/restore.sh ${DUMP}
 
 us-install:
 	docker-compose -p userside exec fpm /app/install.sh
