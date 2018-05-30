@@ -1,3 +1,6 @@
+confirmation:
+	@( read -p "This action will delete all data!!! Are you sure? [y/N]: " sure && case "$$sure" in [yY]) true;; *) false;; esac )
+
 install: up us-install
 	/bin/bash create-configs.sh
 	@echo "Install complete."
@@ -8,7 +11,7 @@ up:
 stop:
 	docker-compose -p userside stop
 
-down:
+down: confirmation
 	docker-compose -p userside down
 
 pull:
