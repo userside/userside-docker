@@ -1,8 +1,9 @@
 # If you are using multiple copies of the USERSIDE, specify here a unique name for each of them.
 PROJECT_NAME=userside
 
-up: bundle-start
+up: bundle-up
 down: bundle-stop
+stop: bundle-stop
 install: create-env-dir bundle-up us-install cron-setup cron-run
 userside-install: us-install
 update: backup bundle-stop bundle-pull install postgres-postgis-update
@@ -11,7 +12,7 @@ log: bundle-logs
 
 #####################################################################
 
-bundle-start:
+bundle-up:
 	docker-compose -p ${PROJECT_NAME} up -d
 
 bundle-stop:
