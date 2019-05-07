@@ -1,0 +1,78 @@
+# If you are using multiple copies of the USERSIDE, specify here a unique name for each of them.
+PROJECT_NAME=userside
+
+up: bundle-start
+down: bundle-stop
+install: create-env-dir bundle-up us-install cron-setup cron-run
+userside-install: us-install
+update: backup bundle-stop bundle-pull install postgres-postgis-update
+uninstall: confirmation bundle-down cron-remove
+log: bundle-logs
+
+#####################################################################
+
+bundle-start:
+	docker-compose -p ${PROJECT_NAME} up -d
+
+bundle-stop:
+	docker-compose -p ${PROJECT_NAME} stop
+
+bundle-down:
+	docker-compose -p ${PROJECT_NAME} down -v --remove-orphans
+
+bundle-logs:
+	docker-compose -p ${PROJECT_NAME} logs -f
+
+bundle-pull:
+	docker-compose -p ${PROJECT_NAME} pull
+
+####
+
+create-env-dir:
+	mkdir -p data/db data/backup data/userside
+
+us-install:
+	docker-compose -p ${PROJECT_NAME} exec fpm /app/install.sh
+
+####
+
+redis-cli:
+	docker-compose -p ${PROJECT_NAME} exec redis redis-cli
+
+postgres-psql:
+	docker-compose -p ${PROJECT_NAME} exec postgres psql -U userside
+
+postgres-postgis-update:
+	docker-compose -p ${PROJECT_NAME} exec postgres psql -U userside -c "ALTER EXTENSION postgis UPDATE"
+
+####
+
+backup:
+	docker-compose -p ${PROJECT_NAME} exec postgres /app/backup.sh
+	docker-compose -p ${PROJECT_NAME} exec fpm /app/backup.sh
+
+dbrestore:
+	docker-compose -p ${PROJECT_NAME} exec postgres /app/restore.sh ${DUMP}
+
+####
+
+define CRON_TASKS
+* * * * *    root    docker exec -t ${PROJECT_NAME}_fpm_1 php userside cron > /dev/null 2>&1
+0 3 * * *    root    docker exec ${PROJECT_NAME}_fpm_1 /app/backup.sh > /dev/null 2>&1
+0 4 * * *    root    docker exec ${PROJECT_NAME}_postgres_1 /app/backup.sh > /dev/null 2>&1
+endef
+export CRON_TASKS
+
+cron-setup: 
+	@test -f /etc/cron.d/${PROJECT_NAME} || echo "Creating CRON tasks..." ; echo "$$CRON_TASKS" | sudo tee /etc/cron.d/${PROJECT_NAME}
+
+cron-run:
+	docker-compose -p ${PROJECT_NAME} exec fpm php userside cron
+
+cron-remove:
+	sudo rm -f /etc/cron.d/${PROJECT_NAME}
+
+####
+
+confirmation:
+	@( read -p "This action will DELETE all data of ${PROJECT_NAME}!!! Are you sure? [y/N]: " sure && case "$$sure" in [yY]) true;; *) false;; esac )

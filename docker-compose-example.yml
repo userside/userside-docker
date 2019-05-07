@@ -1,8 +1,8 @@
-version: '3'
+version: '3.1'
 
 services:
   postgres:
-    image: erpuserside/postgres:3.0
+    image: erpuserside/userside:3.13-postgres
     restart: always
     environment:
       LANG: ru_RU.UTF-8
@@ -11,7 +11,7 @@ services:
       POSTGRES_USER: userside
       POSTGRES_PASSWORD: userside
     volumes:
-      - /var/lib/postgresql/data
+      - db:/var/lib/postgresql/data
       - backup:/backup
     networks:
       - internal
@@ -19,26 +19,40 @@ services:
   fpm:
     depends_on:
       - postgres
-    image: erpuserside/fpm:3.12
+      - redis
+    image: erpuserside/userside:3.13-fpm
     restart: always
     environment:
       TZ: 'Europe/Zaporozhye'
     volumes:
       - www:/app/userside
       - backup:/backup
+      #- ./config/php.ini:/usr/local/etc/php/php.ini
     networks:
       - internal
 
   nginx:
     depends_on:
       - fpm
-    image: erpuserside/nginx:3.0
+    image: erpuserside/userside:3.13-nginx
     restart: always
     ports:
       - "80:80"
     volumes:
       - www:/app/userside
-      - /var/log/userside/nginx:/app/log
+    networks:
+      - internal
+    logging:
+        driver: "json-file"
+        options:
+          # Setup NGINX logging here!
+          max-file: "10"
+          max-size: "20m"
+  
+  redis:
+    image: redis:alpine
+    volumes:
+      - redis:/data
     networks:
       - internal
 
@@ -46,13 +60,19 @@ volumes:
   www:
     driver_opts:
       type: none
-      device: /opt/userside
+      device: ${PWD}/data/userside
       o: bind
   backup:
     driver_opts:
       type: none
-      device: /opt/backup
+      device: ${PWD}/data/backup
       o: bind
+  db:
+    driver_opts:
+      type: none
+      device: ${PWD}/data/db
+      o: bind
+  redis:
 
 networks:
   internal:
@@ -60,4 +80,4 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 172.31.0.0/28
+        - subnet: 172.31.255.0/28
