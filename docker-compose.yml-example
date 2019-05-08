@@ -60,17 +60,17 @@ volumes:
   www:
     driver_opts:
       type: none
-      device: ${PWD}/data/userside
+      device: /docker/userside/data/userside
       o: bind
   backup:
     driver_opts:
       type: none
-      device: ${PWD}/data/backup
+      device: /docker/userside/data/backup
       o: bind
   db:
     driver_opts:
       type: none
-      device: ${PWD}/data/db
+      device: /docker/userside/data/db
       o: bind
   redis:
 
