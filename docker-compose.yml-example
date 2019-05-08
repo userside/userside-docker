@@ -2,7 +2,7 @@ version: '3.1'
 
 services:
   postgres:
-    image: erpuserside/userside:3.13-postgres
+    image: erpuserside/userside:3.12-postgres
     restart: always
     environment:
       LANG: ru_RU.UTF-8
@@ -19,8 +19,7 @@ services:
   fpm:
     depends_on:
       - postgres
-      - redis
-    image: erpuserside/userside:3.13-fpm
+    image: erpuserside/userside:3.12-fpm
     restart: always
     environment:
       TZ: 'Europe/Zaporozhye'
@@ -34,7 +33,7 @@ services:
   nginx:
     depends_on:
       - fpm
-    image: erpuserside/userside:3.13-nginx
+    image: erpuserside/userside:3.12-nginx
     restart: always
     ports:
       - "80:80"
@@ -48,31 +47,23 @@ services:
           # Setup NGINX logging here!
           max-file: "10"
           max-size: "20m"
-  
-  redis:
-    image: redis:alpine
-    volumes:
-      - redis:/data
-    networks:
-      - internal
 
 volumes:
   www:
     driver_opts:
       type: none
-      device: ${PWD}/data/userside
+      device: /docker/userside/data/userside
       o: bind
   backup:
     driver_opts:
       type: none
-      device: ${PWD}/data/backup
+      device: /docker/userside/data/backup
       o: bind
   db:
     driver_opts:
       type: none
-      device: ${PWD}/data/db
+      device: /docker/userside/data/db
       o: bind
-  redis:
 
 networks:
   internal:

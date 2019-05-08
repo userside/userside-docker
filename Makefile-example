@@ -37,9 +37,6 @@ us-install:
 
 ####
 
-redis-cli:
-	docker-compose -p ${PROJECT_NAME} exec redis redis-cli
-
 postgres-psql:
 	docker-compose -p ${PROJECT_NAME} exec postgres psql -U userside
 
