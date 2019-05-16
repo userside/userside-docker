@@ -51,6 +51,7 @@ services:
   
   redis:
     image: redis:alpine
+    restart: always
     volumes:
       - redis:/data
     networks:
