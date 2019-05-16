@@ -2,7 +2,7 @@ version: '3.1'
 
 services:
   postgres:
-    image: erpuserside/userside:3.12-postgres
+    image: erpuserside/userside:3.13-postgres
     restart: always
     environment:
       LANG: ru_RU.UTF-8
@@ -19,7 +19,8 @@ services:
   fpm:
     depends_on:
       - postgres
-    image: erpuserside/userside:3.12-fpm
+      - redis
+    image: erpuserside/userside:3.13-fpm
     restart: always
     environment:
       TZ: 'Europe/Zaporozhye'
@@ -33,7 +34,7 @@ services:
   nginx:
     depends_on:
       - fpm
-    image: erpuserside/userside:3.12-nginx
+    image: erpuserside/userside:3.13-nginx
     restart: always
     ports:
       - "80:80"
@@ -72,6 +73,7 @@ volumes:
       type: none
       device: /docker/userside/data/db
       o: bind
+  redis:
 
 networks:
   internal:
