@@ -47,6 +47,14 @@ services:
           # Setup NGINX logging here!
           max-file: "10"
           max-size: "20m"
+  
+  redis:
+    image: redis:alpine
+    restart: always
+    volumes:
+      - redis:/data
+    networks:
+      - internal
 
 volumes:
   www:
