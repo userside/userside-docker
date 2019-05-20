@@ -56,6 +56,9 @@ services:
       - redis:/data
     networks:
       - internal
+    # To use a password, uncomment the line below and enter your password instead of MYPASSWORDHERE
+    # Please note! Password may be a very strong and very long value!!! (sha256sum)
+    # command: redis-server --requirepass MYPASSWORDHERE
 
 volumes:
   www:
