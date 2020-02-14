@@ -1,5 +1,10 @@
-# If you are using multiple copies of the USERSIDE, specify here a unique name for each of them.
+# If you use more than one copy of the USERSIDE, specify different identifiers for each of them here.
 PROJECT_NAME=userside
+
+# If you use a different database username than the default.
+POSTGRES_USER=userside
+
+#####################################################################
 
 up: bundle-up
 down: bundle-stop
@@ -42,10 +47,10 @@ us-cache-flush:
 ####
 
 postgres-psql:
-	docker-compose -p ${PROJECT_NAME} exec postgres psql -U userside
+	docker-compose -p ${PROJECT_NAME} exec postgres psql -U ${POSTGRES_USER}
 
 postgres-postgis-update:
-	docker-compose -p ${PROJECT_NAME} exec postgres psql -U userside -c "ALTER EXTENSION postgis UPDATE"
+	docker-compose -p ${PROJECT_NAME} exec postgres psql -U ${POSTGRES_USER} -c "ALTER EXTENSION postgis UPDATE"
 
 ####
 
