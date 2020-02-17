@@ -7,8 +7,8 @@ services:
     environment:
       LANG: ru_RU.UTF-8
       TZ: 'Europe/Zaporozhye'
-      POSTGRES_DB: userside
-      POSTGRES_USER: userside
+      POSTGRES_DB: userside    # If it has been changed, the POSTGRES_DB variable in the Makefile must be changed too.
+      POSTGRES_USER: userside  # If it has been changed, the POSTGRES_USER variable in the Makefile must be changed too.
       POSTGRES_PASSWORD: userside
     volumes:
       - db:/var/lib/postgresql/data
