@@ -1,0 +1,5 @@
+{
+    "stability": "stable",
+    "pgsql_dsn": "pgsql:host=postgres;dbname=userside;username=userside;password=userside",
+    "redis_url": "redis://redis"
+}
