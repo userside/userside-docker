@@ -40,7 +40,7 @@ create-env-dir:
 	mkdir -p data/db data/backup data/userside
 
 us-install:
-	docker-compose -p ${PROJECT_NAME} exec fpm /app/install.sh
+	docker-compose -p ${PROJECT_NAME} exec fpm /app/userside_install.sh install
 
 us-cache-flush:
 	docker-compose -p ${PROJECT_NAME} exec fpm php userside cache/flush-all
