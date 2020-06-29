@@ -12,6 +12,7 @@ down: bundle-stop
 stop: bundle-stop
 install: create-env-dir bundle-up us-install cron-setup cron-run
 userside-install: us-install
+userside-repair: us-repair
 update: backup us-cache-flush bundle-stop bundle-pull install postgres-postgis-update
 uninstall: confirmation bundle-down cron-remove
 log: bundle-logs
@@ -41,6 +42,9 @@ create-env-dir:
 
 us-install:
 	docker-compose -p ${PROJECT_NAME} exec fpm /app/userside_install.sh install
+
+us-repair:
+	docker-compose -p ${PROJECT_NAME} exec fpm /app/userside_install.sh repair
 
 us-cache-flush:
 	docker-compose -p ${PROJECT_NAME} exec fpm php userside cache/flush-all
