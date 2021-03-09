@@ -1,5 +1,5 @@
 [PHP]
-# Don't change this parameter!
+; Don't change this parameter!
 cgi.fix_pathinfo=0
 
 post_max_size = 128M
