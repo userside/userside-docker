@@ -1,32 +1,29 @@
-# If you use more than one copy of the USERSIDE, specify different identifiers for each of them here.
-PROJECT_NAME=userside
-
-# If you use a different database name and username than the default.
-POSTGRES_DB=userside
-POSTGRES_USER=userside
+include .env
+export
 
 #####################################################################
 
 up: bundle-up
 down: bundle-stop
 stop: bundle-stop
-install: create-env-dir bundle-up us-install cron-setup cron-run
+restart: down up
+install: create-init-dirs-and-files bundle-up us-install cron-setup cron-run need-restart
 userside-install: us-install
 userside-repair: us-repair
-update: backup us-cache-flush bundle-stop bundle-pull install postgres-postgis-update
-uninstall: confirmation bundle-down cron-remove
+update: backup us-cache-flush bundle-stop bundle-pull cron-remove install postgres-postgis-update
+uninstall: bundle-destroy cron-remove
 log: bundle-logs
 flush: us-cache-flush
 
 #####################################################################
 
 bundle-up:
-	docker-compose -p ${PROJECT_NAME} up -d
+	docker-compose -p ${PROJECT_NAME} up -d --scale core-worker=${CORE_WORKER_NUM} --scale poller=${POLLER_NUM}
 
 bundle-stop:
 	docker-compose -p ${PROJECT_NAME} stop
 
-bundle-down:
+bundle-destroy: confirmation
 	docker-compose -p ${PROJECT_NAME} down -v --remove-orphans
 
 bundle-logs:
@@ -37,17 +34,21 @@ bundle-pull:
 
 ####
 
-create-env-dir:
-	mkdir -p data/db data/backup data/userside
+create-init-dirs-and-files:
+	mkdir -p ${USERSIDE_BASE_DIR}/db ${USERSIDE_BASE_DIR}/backup ${USERSIDE_BASE_DIR}/userside
+	@test -f ${USERSIDE_BASE_DIR}/userside/.env || echo "" >> ${USERSIDE_BASE_DIR}/userside/.env
+	@test -f ${USERSIDE_BASE_DIR}/userside/installer.json || \
+		echo "{\"pgsql_dsn\": \"pgsql:host=postgres;dbname=${POSTGRES_DB};port=5432;username=${POSTGRES_USER};password=${POSTGRES_PASSWORD}\",\"redis_url\": \"redis://${REDIS_PASSWORD}@redis\",\"rabbit_url\": \"amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672/%2f\"}" > \
+		${USERSIDE_BASE_DIR}/userside/installer.json
 
 us-install:
-	docker-compose -p ${PROJECT_NAME} exec fpm /app/userside_install.sh install
+	docker-compose -p ${PROJECT_NAME} run --rm php /app/userside_install.sh install
 
 us-repair:
-	docker-compose -p ${PROJECT_NAME} exec fpm /app/userside_install.sh repair
+	docker-compose -p ${PROJECT_NAME} run --rm php /app/userside_install.sh repair
 
 us-cache-flush:
-	docker-compose -p ${PROJECT_NAME} exec fpm php userside cache/flush-all
+	docker-compose -p ${PROJECT_NAME} run --rm php php userside cache/flush-all
 
 ####
 
@@ -61,7 +62,7 @@ postgres-postgis-update:
 
 backup:
 	docker-compose -p ${PROJECT_NAME} exec postgres /app/backup.sh
-	docker-compose -p ${PROJECT_NAME} exec fpm /app/backup.sh
+	docker-compose -p ${PROJECT_NAME} run --rm php /app/backup.sh
 
 dbrestore:
 	docker-compose -p ${PROJECT_NAME} exec postgres /app/restore.sh ${DUMP}
@@ -69,17 +70,18 @@ dbrestore:
 ####
 
 define CRON_TASKS
-* * * * *    root    docker exec -t ${PROJECT_NAME}_fpm_1 php userside cron > /dev/null 2>&1
-0 3 * * *    root    docker exec ${PROJECT_NAME}_fpm_1 /app/backup.sh > /dev/null 2>&1
+* * * * *    root    docker run --rm -t ${PROJECT_NAME}_php_1 php userside cron > /dev/null 2>&1
+0 3 * * *    root    docker run --rm ${PROJECT_NAME}_php_1 /app/backup.sh > /dev/null 2>&1
 0 4 * * *    root    docker exec ${PROJECT_NAME}_postgres_1 /app/backup.sh > /dev/null 2>&1
 endef
 export CRON_TASKS
 
-cron-setup: 
-	@test -f /etc/cron.d/${PROJECT_NAME} || echo "Creating CRON tasks..." ; echo "$$CRON_TASKS" | sudo tee /etc/cron.d/${PROJECT_NAME}
+cron-setup:
+	@echo "Add crontab tasks:"
+	@echo "$$CRON_TASKS" | sudo tee /etc/cron.d/${PROJECT_NAME}
 
 cron-run:
-	docker-compose -p ${PROJECT_NAME} exec fpm php userside cron
+	docker-compose -p ${PROJECT_NAME} run --rm php php userside cron
 
 cron-remove:
 	sudo rm -f /etc/cron.d/${PROJECT_NAME}
@@ -88,3 +90,13 @@ cron-remove:
 
 confirmation:
 	@( read -p "This action will DELETE all data of ${PROJECT_NAME}!!! Are you sure? [y/N]: " sure && case "$$sure" in [yY]) true;; *) false;; esac )
+
+need-restart:
+	@echo ""
+	@echo "\e[1m\e[31mThe USERSIDE bundle need to be restart!\e[0m\n"
+	@echo ""
+	@echo "Please run:"
+	@echo ""
+	@echo "    \033[1msudo make restart\033[0m"
+	@echo ""
+	@echo ""

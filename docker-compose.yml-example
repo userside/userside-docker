@@ -1,15 +1,11 @@
-version: '3.1'
+version: "3.2"
 
 services:
   postgres:
-    image: erpuserside/userside:3.13-postgres
+    image: erpuserside/userside:3.16-postgres
     restart: always
-    environment:
-      LANG: ru_RU.UTF-8
-      TZ: 'Europe/Zaporozhye'
-      POSTGRES_DB: userside    # If it has been changed, the POSTGRES_DB variable in the Makefile must be changed too.
-      POSTGRES_USER: userside  # If it has been changed, the POSTGRES_USER variable in the Makefile must be changed too.
-      POSTGRES_PASSWORD: userside
+    env_file:
+      - .env
     volumes:
       - db:/var/lib/postgresql/data
       - backup:/backup
@@ -17,39 +13,87 @@ services:
       - internal
 
   fpm:
+    image: erpuserside/userside:3.16-fpm
+    restart: always
     depends_on:
       - postgres
       - redis
-    image: erpuserside/userside:3.13-fpm
-    restart: always
-    environment:
-      TZ: 'Europe/Zaporozhye'
+      - rabbitmq
+    env_file:
+      - .env
     volumes:
       - www:/app/userside
-      - backup:/backup
       #- ./config/php.ini:/usr/local/etc/php/php.ini
       #- ./config/www.conf:/usr/local/etc/php-fpm.d/www.conf
     networks:
       - internal
 
+  php:
+    image: erpuserside/userside:3.16-php
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    env_file:
+      - .env
+    volumes:
+      - www:/app/userside
+      - backup:/backup
+    networks:
+      - internal
+
+  core-worker:
+    image: erpuserside/userside:3.16-php
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    env_file:
+      - .env
+    volumes:
+      - www:/app/userside
+    networks:
+      - internal
+    command: php /app/userside/userside queue/listen
+
+  poller:
+    restart: always
+    depends_on:
+      - rabbitmq
+      - core-worker
+    image: erpuserside/userside:3.16-poller
+    env_file:
+      - ${USERSIDE_BASE_DIR}/userside/.env
+    environment:
+      US_POLLER_LOGFILE: /dev/stdout
+    volumes:
+      - ${USERSIDE_BASE_DIR}/userside/microservice/poller:/app
+    networks:
+      - internal
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "10"
+        max-size: "20m"
+
   nginx:
     depends_on:
       - fpm
-    image: erpuserside/userside:3.13-nginx
+    image: erpuserside/userside:3.16-nginx
     restart: always
     ports:
-      - "80:80"
+      - 80:80
     volumes:
       - www:/app/userside
     networks:
       - internal
     logging:
-        driver: "json-file"
-        options:
-          # Setup NGINX logging here!
-          max-file: "10"
-          max-size: "20m"
-  
+      driver: "json-file"
+      options:
+        max-file: "10"
+        max-size: "20m"
+
   redis:
     image: redis:alpine
     restart: always
@@ -57,27 +101,39 @@ services:
       - redis:/data
     networks:
       - internal
-    # To use a password, uncomment the line below and enter your password instead of MYPASSWORDHERE
-    # Please note! Password may be a very strong and very long value!!! (sha256sum)
-    # command: redis-server --requirepass MYPASSWORDHERE
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+
+  rabbitmq:
+    image: erpuserside/userside:3.16-rabbitmq
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - rabbitmq:/var/lib/rabbitmq
+    networks:
+      - internal
+    ports:
+      # - 5672:5672 # AMQP for external access
+      - 15672:15672 # RabbitMQ management
 
 volumes:
   www:
     driver_opts:
       type: none
-      device: /docker/userside/data/userside
+      device: ${USERSIDE_BASE_DIR}/userside
       o: bind
   backup:
     driver_opts:
       type: none
-      device: /docker/userside/data/backup
+      device: ${USERSIDE_BASE_DIR}/backup
       o: bind
   db:
     driver_opts:
       type: none
-      device: /docker/userside/data/db
+      device: ${USERSIDE_BASE_DIR}/db
       o: bind
   redis:
+  rabbitmq:
 
 networks:
   internal:
@@ -85,4 +141,4 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 172.31.255.0/28
+        - subnet: 172.31.254.0/25

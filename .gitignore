@@ -1,3 +1,5 @@
 data/
 docker-compose.yml
 Makefile
+copy_to_examples.sh
+.env
