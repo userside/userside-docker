@@ -64,11 +64,11 @@ services:
       - core-worker
     image: erpuserside/userside:3.16-poller
     env_file:
-      - ${USERSIDE_BASE_DIR}/userside/.env
+      - ${USERSIDE_BASE_DIR}/data/userside/.env
     environment:
       US_POLLER_LOGFILE: /dev/stdout
     volumes:
-      - ${USERSIDE_BASE_DIR}/userside/microservice/poller:/app
+      - ${USERSIDE_BASE_DIR}/data/userside/microservice/poller:/app
     networks:
       - internal
     logging:
@@ -120,17 +120,17 @@ volumes:
   www:
     driver_opts:
       type: none
-      device: ${USERSIDE_BASE_DIR}/userside
+      device: ${USERSIDE_BASE_DIR}/data/userside
       o: bind
   backup:
     driver_opts:
       type: none
-      device: ${USERSIDE_BASE_DIR}/backup
+      device: ${USERSIDE_BASE_DIR}/data/backup
       o: bind
   db:
     driver_opts:
       type: none
-      device: ${USERSIDE_BASE_DIR}/db
+      device: ${USERSIDE_BASE_DIR}/data/db
       o: bind
   redis:
   rabbitmq:

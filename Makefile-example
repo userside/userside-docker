@@ -35,11 +35,11 @@ bundle-pull:
 ####
 
 create-init-dirs-and-files:
-	mkdir -p ${USERSIDE_BASE_DIR}/db ${USERSIDE_BASE_DIR}/backup ${USERSIDE_BASE_DIR}/userside
-	@test -f ${USERSIDE_BASE_DIR}/userside/.env || echo "" >> ${USERSIDE_BASE_DIR}/userside/.env
-	@test -f ${USERSIDE_BASE_DIR}/userside/installer.json || \
+	mkdir -p ${USERSIDE_BASE_DIR}/data/db ${USERSIDE_BASE_DIR}/data/backup ${USERSIDE_BASE_DIR}/data/userside
+	@test -f ${USERSIDE_BASE_DIR}/data/userside/.env || echo "" >> ${USERSIDE_BASE_DIR}/data/userside/.env
+	@test -f ${USERSIDE_BASE_DIR}/data/userside/installer.json || \
 		echo "{\"stability\": \"dev\", \"pgsql_dsn\": \"pgsql:host=postgres;dbname=${POSTGRES_DB};port=5432;username=${POSTGRES_USER};password=${POSTGRES_PASSWORD}\",\"redis_url\": \"redis://${REDIS_PASSWORD}@redis\",\"rabbit_url\": \"amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672/%2f\"}" > \
-		${USERSIDE_BASE_DIR}/userside/installer.json
+		${USERSIDE_BASE_DIR}/data/userside/installer.json
 
 us-install:
 	docker-compose -p ${PROJECT_NAME} run --rm php /app/userside_install.sh install
@@ -49,6 +49,9 @@ us-repair:
 
 us-cache-flush:
 	docker-compose -p ${PROJECT_NAME} run --rm php php userside cache/flush-all
+
+us-change-stability:
+	docker-compose -p ${PROJECT_NAME} run --rm php php userside config --stability=${STABILITY_LEVEL}
 
 ####
 
