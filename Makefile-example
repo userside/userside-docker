@@ -51,7 +51,7 @@ us-cache-flush:
 	docker-compose -p ${PROJECT_NAME} run --rm php php userside cache/flush-all
 
 us-change-stability:
-	docker-compose -p ${PROJECT_NAME} run --rm php php userside config --stability=${STABILITY_LEVEL}
+	docker-compose -p ${PROJECT_NAME} run --rm php /app/userside_install.sh config --stability=${STABILITY_LEVEL}
 
 ####
 
