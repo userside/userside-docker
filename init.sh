@@ -6,5 +6,5 @@ cp -n .env-example .env
 
 echo "Init comlete. Please, edit .env file, then run"
 echo ""
-echo "  make install"
+echo "  sudo make install"
 echo ""

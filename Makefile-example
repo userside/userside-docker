@@ -3,6 +3,8 @@ export
 
 #####################################################################
 
+DOCKER_COMPOSE = docker-compose -f ${USERSIDE_BASE_DIR}/docker-compose.yml -p ${PROJECT_NAME}
+
 define INSTALLER_JSON
 {
   "pgsql_dsn": "pgsql:host=postgres;dbname=${POSTGRES_DB};port=5432;username=${POSTGRES_USER};password=${POSTGRES_PASSWORD}",
@@ -14,9 +16,9 @@ endef
 export INSTALLER_JSON
 
 define CRON_TASKS
-* * * * *    root    docker run --rm -t ${PROJECT_NAME}_php_1 php userside cron > /dev/null 2>&1
-0 3 * * *    root    docker run --rm ${PROJECT_NAME}_php_1 /app/backup.sh > /dev/null 2>&1
-0 4 * * *    root    docker exec ${PROJECT_NAME}_postgres_1 /app/backup.sh > /dev/null 2>&1
+* * * * *    root    ${DOCKER_COMPOSE} run --rm php php userside cron > /dev/null
+0 3 * * *    root    ${DOCKER_COMPOSE} run --rm php /app/backup.sh > /dev/null
+0 4 * * *    root    ${DOCKER_COMPOSE} exec postgres /app/backup.sh > /dev/null
 endef
 export CRON_TASKS
 
@@ -37,19 +39,19 @@ flush: us-cache-flush
 #####################################################################
 
 bundle-up:
-	docker-compose -p ${PROJECT_NAME} up -d --scale core-worker=${CORE_WORKER_NUM} --scale poller=${POLLER_NUM}
+	${DOCKER_COMPOSE} up -d --scale core-worker=${CORE_WORKER_NUM} --scale poller=${POLLER_NUM}
 
 bundle-stop:
-	docker-compose -p ${PROJECT_NAME} stop
+	${DOCKER_COMPOSE} stop
 
 bundle-destroy: confirmation
-	docker-compose -p ${PROJECT_NAME} down -v --remove-orphans
+	${DOCKER_COMPOSE} down -v --remove-orphans
 
 bundle-logs:
-	docker-compose -p ${PROJECT_NAME} logs -f
+	${DOCKER_COMPOSE} logs -f
 
 bundle-pull:
-	docker-compose -p ${PROJECT_NAME} pull
+	${DOCKER_COMPOSE} pull
 
 ####
 
@@ -60,46 +62,46 @@ create-init-dirs-and-files:
 		echo "$$INSTALLER_JSON" > ${USERSIDE_BASE_DIR}/data/userside/installer.json
 
 us-install:
-	docker-compose -p ${PROJECT_NAME} run --rm php /app/userside_install.sh install
+	${DOCKER_COMPOSE} run --rm php /app/userside_install.sh install
 
 us-repair:
-	docker-compose -p ${PROJECT_NAME} run --rm php /app/userside_install.sh repair
+	${DOCKER_COMPOSE} run --rm php /app/userside_install.sh repair
 
 us-cache-flush:
-	docker-compose -p ${PROJECT_NAME} run --rm php php userside cache/flush-all
+	${DOCKER_COMPOSE} run --rm php php userside cache/flush-all
 
 us-change-stability:
-	docker-compose -p ${PROJECT_NAME} run --rm php /app/userside_install.sh config --stability=${STABILITY_LEVEL}
+	${DOCKER_COMPOSE} run --rm php /app/userside_install.sh config --stability=${STABILITY_LEVEL}
 
 ####
 
 postgres-psql:
-	docker-compose -p ${PROJECT_NAME} exec postgres psql -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+	${DOCKER_COMPOSE} exec postgres psql -U ${POSTGRES_USER} -d ${POSTGRES_DB}
 
 postgres-postgis-update:
-	docker-compose -p ${PROJECT_NAME} exec postgres psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c "ALTER EXTENSION postgis UPDATE"
+	${DOCKER_COMPOSE} exec postgres psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c "ALTER EXTENSION postgis UPDATE"
 
 ####
 
 rabbitmq-cleanup: rabbitmq-stop rabbitmq-reset rabbitmq-start
 
 rabbitmq-stop:
-	docker-compose -p ${PROJECT_NAME} exec rabbitmq rabbitmqctl stop_app
+	${DOCKER_COMPOSE} exec rabbitmq rabbitmqctl stop_app
 
 rabbitmq-reset:
-	docker-compose -p ${PROJECT_NAME} exec rabbitmq rabbitmqctl reset
+	${DOCKER_COMPOSE} exec rabbitmq rabbitmqctl reset
 
 rabbitmq-start:
-	docker-compose -p ${PROJECT_NAME} exec rabbitmq rabbitmqctl start_app
+	${DOCKER_COMPOSE} exec rabbitmq rabbitmqctl start_app
 
 ####
 
 backup:
-	docker-compose -p ${PROJECT_NAME} exec postgres /app/backup.sh
-	docker-compose -p ${PROJECT_NAME} run --rm php /app/backup.sh
+	${DOCKER_COMPOSE} exec postgres /app/backup.sh
+	${DOCKER_COMPOSE} run --rm php /app/backup.sh
 
 dbrestore:
-	docker-compose -p ${PROJECT_NAME} exec postgres /app/restore.sh ${DUMP}
+	${DOCKER_COMPOSE} exec postgres /app/restore.sh ${DUMP}
 
 ####
 
@@ -108,7 +110,7 @@ cron-setup:
 	@echo "$$CRON_TASKS" | sudo tee /etc/cron.d/${PROJECT_NAME}
 
 cron-run:
-	docker-compose -p ${PROJECT_NAME} run --rm php php userside cron
+	${DOCKER_COMPOSE} run --rm php php userside cron
 
 cron-remove:
 	sudo rm -f /etc/cron.d/${PROJECT_NAME}

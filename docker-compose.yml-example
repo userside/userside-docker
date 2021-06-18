@@ -5,7 +5,7 @@ services:
     image: erpuserside/userside:3.16-postgres
     restart: always
     env_file:
-      - .env
+      - ${USERSIDE_BASE_DIR}/.env
     volumes:
       - db:/var/lib/postgresql/data
       - backup:/backup
@@ -22,7 +22,7 @@ services:
       - redis
       - rabbitmq
     env_file:
-      - .env
+      - ${USERSIDE_BASE_DIR}/.env
     volumes:
       - www:/app/userside
       - /etc/localtime:/etc/localtime:ro
@@ -40,7 +40,7 @@ services:
       - redis
       - rabbitmq
     env_file:
-      - .env
+      - ${USERSIDE_BASE_DIR}/.env
     volumes:
       - www:/app/userside
       - backup:/backup
@@ -59,7 +59,7 @@ services:
       - redis
       - rabbitmq
     env_file:
-      - .env
+      - ${USERSIDE_BASE_DIR}/.env
     volumes:
       - www:/app/userside
       - /etc/localtime:/etc/localtime:ro
@@ -124,7 +124,7 @@ services:
     image: erpuserside/userside:3.16-rabbitmq
     restart: always
     env_file:
-      - .env
+      - ${USERSIDE_BASE_DIR}/.env
     volumes:
       - rabbitmq:/var/lib/rabbitmq
       - /etc/localtime:/etc/localtime:ro
