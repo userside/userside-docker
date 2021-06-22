@@ -3,7 +3,8 @@ export
 
 #####################################################################
 
-DOCKER_COMPOSE = docker-compose -f ${USERSIDE_BASE_DIR}/docker-compose.yml -p ${PROJECT_NAME}
+DOCKER_COMPOSE = /usr/local/bin/docker-compose -p ${PROJECT_NAME}
+DOCKER_COMPOSE_CRON = ${DOCKER_COMPOSE} -f ${USERSIDE_BASE_DIR}/docker-compose.yml --env-file ${USERSIDE_BASE_DIR}/.env
 
 define INSTALLER_JSON
 {
@@ -16,9 +17,9 @@ endef
 export INSTALLER_JSON
 
 define CRON_TASKS
-* * * * *    root    ${DOCKER_COMPOSE} run --rm php php userside cron > /dev/null
-0 3 * * *    root    ${DOCKER_COMPOSE} run --rm php /app/backup.sh > /dev/null
-0 4 * * *    root    ${DOCKER_COMPOSE} exec postgres /app/backup.sh > /dev/null
+* * * * *    root    ${DOCKER_COMPOSE_CRON} run --rm php php userside cron > /dev/null
+0 3 * * *    root    ${DOCKER_COMPOSE_CRON} run --rm php /app/backup.sh > /dev/null
+0 4 * * *    root    ${DOCKER_COMPOSE_CRON} exec postgres /app/backup.sh > /dev/null
 endef
 export CRON_TASKS
 

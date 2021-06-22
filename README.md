@@ -17,7 +17,7 @@ sudo mkdir -p /docker && cd $_
 ```
 4. Склонируйте этот репозиторий в подкаталог userside и перейдитие в него:
 ```
-sudo git clone -–depth 1 --branch v3.16 https://github.com/userside/userside-docker.git userside && cd userside
+sudo git clone --depth 1 --branch v3.16 https://github.com/userside/userside-docker.git userside && cd userside
 ```
 5. Выполните команду инициализации конфигов бандла — она создаст копии образцов с рабочими именами файлов. Теперь у вас есть файлы **.env**, **docker-compose.yml**, **Makefile**:
 ```
