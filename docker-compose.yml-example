@@ -123,8 +123,9 @@ services:
   rabbitmq:
     image: erpuserside/userside:3.16-rabbitmq
     restart: always
-    env_file:
-      - ${USERSIDE_BASE_DIR}/.env
+    environment:
+      DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
     volumes:
       - rabbitmq:/var/lib/rabbitmq
       - /etc/localtime:/etc/localtime:ro
