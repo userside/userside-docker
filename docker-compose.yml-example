@@ -135,6 +135,33 @@ services:
       # - 5672:5672 # AMQP for external access
       - 15672:15672 # RabbitMQ management
 
+  usm_billing:
+    image: erpuserside/usm_billing
+    depends_on:
+      - nginx
+    environment:
+      # USERSIDE_API_URL: "" # It is not necessary if userside works in the same bundle
+      USERSIDE_API_KEY: ""
+      BILLING_NAME: ""
+      BILLING_URL: ""
+      BILLING_ID: ""
+      IS_DISABLE_CREATE_ADDRESS: 0 # Flag - Disable Create New Address Object (house, street etc) [0|1]
+      IS_SKIP_UPDATE_AGREEMENT_DATE: 0 # Flag - Is Skip Update Agreement Date
+      IS_SKIP_UPDATE_DATE_ACTIVITY: 0 # Flag - Is Skip Update Date Activity
+      IS_SKIP_DELETE_EMPTY_IP: 0 # Flag - Is Skip Delete Empty Ip
+      SKIP_DELETE_IP_LIST: "" # comma separated Diapazon Of Skipped Ip
+      IS_IMPORT_LESS_ADDRESS: 0 # Flag - Is Update Empty Customer Address
+      IS_IMPORT_LESS_PHONE: 0 # Flag - Is Update Empty Customer Phone
+      IS_UPDATE_EMPTY_LEVEL: 0 # Flag - Is Update Empty Customer Level
+      IS_UPDATE_EMPTY_ENTRANCE: 0 # Flag - Is Update Empty Customer Entrance
+      IS_SKIP_UNUSED_ADDRESS: 0 # Flag - Is Skip Unused Address
+    volumes:
+      - ${USERSIDE_BASE_DIR}/data/userside/var/log/usm_billing:/module/log
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    networks:
+      - internal
+
 volumes:
   www:
     driver_opts:

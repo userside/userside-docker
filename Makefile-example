@@ -11,7 +11,7 @@ define INSTALLER_JSON
   "pgsql_dsn": "pgsql:host=postgres;dbname=${POSTGRES_DB};port=5432;username=${POSTGRES_USER};password=${POSTGRES_PASSWORD}",
   "redis_url": "redis://${REDIS_PASSWORD}@redis",
   "rabbit_url": "amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672/%2f",
-  "stability": "dev"
+  "stability": "stable"
 }
 endef
 export INSTALLER_JSON
@@ -20,6 +20,7 @@ define CRON_TASKS
 * * * * *    root    ${DOCKER_COMPOSE_CRON} run --rm php php userside cron > /dev/null
 0 3 * * *    root    ${DOCKER_COMPOSE_CRON} run --rm php /app/backup.sh > /dev/null
 0 4 * * *    root    ${DOCKER_COMPOSE_CRON} exec postgres /app/backup.sh > /dev/null
+#*/10 * * * *   root    ${DOCKER_COMPOSE_CRON} run --rm usm_billing > /dev/null
 endef
 export CRON_TASKS
 
@@ -58,6 +59,7 @@ bundle-pull:
 
 create-init-dirs-and-files:
 	mkdir -p ${USERSIDE_BASE_DIR}/data/db ${USERSIDE_BASE_DIR}/data/backup ${USERSIDE_BASE_DIR}/data/userside
+	mkdir -p ${USERSIDE_BASE_DIR}/data/userside/var/log/usm_billing
 	@test -f ${USERSIDE_BASE_DIR}/data/userside/.env || echo "" >> ${USERSIDE_BASE_DIR}/data/userside/.env
 	@test -f ${USERSIDE_BASE_DIR}/data/userside/installer.json || \
 		echo "$$INSTALLER_JSON" > ${USERSIDE_BASE_DIR}/data/userside/installer.json
