@@ -27,9 +27,9 @@ services:
       - www:/app/userside
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-      - ./config/datetime.ini:/usr/local/etc/php/conf.d/timezone.ini
-      #- ./config/php.ini:/usr/local/etc/php/php.ini
-      #- ./config/www.conf:/usr/local/etc/php-fpm.d/www.conf
+      - ${USERSIDE_BASE_DIR}/config/datetime.ini:/usr/local/etc/php/conf.d/timezone.ini
+      #- ${USERSIDE_BASE_DIR}/config/php.ini:/usr/local/etc/php/php.ini
+      #- ${USERSIDE_BASE_DIR}/config/www.conf:/usr/local/etc/php-fpm.d/www.conf
     networks:
       - internal
 
@@ -46,8 +46,8 @@ services:
       - backup:/backup
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-      - ./config/datetime.ini:/usr/local/etc/php/conf.d/timezone.ini
-      #- ./config/php.ini:/usr/local/etc/php/php.ini
+      - ${USERSIDE_BASE_DIR}/config/datetime.ini:/usr/local/etc/php/conf.d/timezone.ini
+      #- ${USERSIDE_BASE_DIR}/config/php.ini:/usr/local/etc/php/php.ini
     networks:
       - internal
 
@@ -157,6 +157,7 @@ services:
       IS_SKIP_UNUSED_ADDRESS: 0 # Flag - Is Skip Unused Address
     volumes:
       - ${USERSIDE_BASE_DIR}/data/userside/var/log/usm_billing:/module/log
+      - ${USERSIDE_BASE_DIR}/config/datetime.ini:/usr/local/etc/php/conf.d/timezone.ini
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     networks:
