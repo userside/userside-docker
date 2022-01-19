@@ -86,6 +86,9 @@ postgres-postgis-update:
 
 ####
 
+rabbitmqctl:
+	${DOCKER_COMPOSE} exec rabbitmq rabbitmqctl
+
 rabbitmq-cleanup: rabbitmq-stop rabbitmq-reset rabbitmq-start
 
 rabbitmq-stop:
