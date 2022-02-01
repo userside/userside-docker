@@ -3,7 +3,12 @@ export
 
 #####################################################################
 
-DOCKER_COMPOSE = /usr/local/bin/docker-compose -p ${PROJECT_NAME}
+ifneq ("$(wildcard $(/usr/local/bin/docker-compose))","")
+	DOCKER_COMPOSE = /usr/local/bin/docker-compose -p ${PROJECT_NAME}
+else
+	DOCKER_COMPOSE = /usr/bin/docker compose -p ${PROJECT_NAME}
+endif
+
 DOCKER_COMPOSE_CRON = ${DOCKER_COMPOSE} -f ${USERSIDE_BASE_DIR}/docker-compose.yml --env-file ${USERSIDE_BASE_DIR}/.env
 
 define INSTALLER_JSON
@@ -35,8 +40,9 @@ userside-install: us-install
 userside-repair: us-repair
 update: backup us-cache-flush bundle-stop bundle-pull cron-remove install postgres-postgis-update
 uninstall: bundle-destroy cron-remove
+purge: bundle-destroy cron-remove bundle-purge
 log: bundle-logs
-flush: us-cache-flush
+flush: us-cache-flush rabbitmq-cleanup
 
 #####################################################################
 
@@ -48,6 +54,12 @@ bundle-stop:
 
 bundle-destroy: confirmation
 	${DOCKER_COMPOSE} down -v --remove-orphans
+
+bundle-purge: confirmation
+ifndef USERSIDE_BASE_DIR
+	$(error USERSIDE_BASE_DIR is undefined)
+endif
+	rm -rf ${USERSIDE_BASE_DIR}/data
 
 bundle-logs:
 	${DOCKER_COMPOSE} logs -f
@@ -86,8 +98,9 @@ postgres-postgis-update:
 
 ####
 
-rabbitmqctl:
-	${DOCKER_COMPOSE} exec rabbitmq rabbitmqctl
+rabbitmq-create-stomp-user:
+	${DOCKER_COMPOSE} exec rabbitmq rabbitmqctl add_user "${STOMP_USER}" "${STOMP_PASSWORD}"
+	${DOCKER_COMPOSE} exec rabbitmq rabbitmqctl set_permissions -p "/" "${STOMP_USER}" "^userside-stomp:id-.*" "" "^userside-stomp:id-.*"
 
 rabbitmq-cleanup: rabbitmq-stop rabbitmq-reset rabbitmq-start
 

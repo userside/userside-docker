@@ -29,6 +29,7 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - ${USERSIDE_BASE_DIR}/config/datetime.ini:/usr/local/etc/php/conf.d/timezone.ini
       #- ${USERSIDE_BASE_DIR}/config/php.ini:/usr/local/etc/php/php.ini
+      #- ${USERSIDE_BASE_DIR}/config/error.ini:/usr/local/etc/php/conf.d/error.ini
       #- ${USERSIDE_BASE_DIR}/config/www.conf:/usr/local/etc/php-fpm.d/www.conf
     networks:
       - internal
@@ -96,7 +97,7 @@ services:
     image: erpuserside/userside:3.16-nginx
     restart: always
     ports:
-      - 80:80
+      - "172.31.254.1:80:80"
     volumes:
       - www:/app/userside
       - /etc/localtime:/etc/localtime:ro
@@ -132,8 +133,9 @@ services:
     networks:
       - internal
     ports:
-      # - 5672:5672 # AMQP for external access
-      - 15672:15672 # RabbitMQ management
+      # - "172.31.254.1:5672:5672" # AMQP for external access
+      - "172.31.254.1:15672:15672" # RabbitMQ management
+      # - "172.31.254.1:15674:15674" # WebSTOMP (websocket)
 
   usm_billing:
     image: erpuserside/usm_billing
