@@ -1,5 +1,6 @@
+.vscode/
 data/
-docker-compose.yml
+compose.yaml
 Makefile
 copy_to_examples.sh
 .env

@@ -1,5 +1,3 @@
-version: "3.2"
-
 services:
   postgres:
     image: erpuserside/userside:3.16-postgres
@@ -97,7 +95,7 @@ services:
     image: erpuserside/userside:3.16-nginx
     restart: always
     ports:
-      - "172.31.254.1:80:80"
+      - "172.31.254.1:8080:80"
     volumes:
       - www:/app/userside
       - /etc/localtime:/etc/localtime:ro
@@ -135,7 +133,7 @@ services:
     ports:
       # - "172.31.254.1:5672:5672" # AMQP for external access
       - "172.31.254.1:15672:15672" # RabbitMQ management
-      # - "172.31.254.1:15674:15674" # WebSTOMP (websocket)
+      - "172.31.254.1:15674:15674" # WebSTOMP (websocket)
 
   usm_billing:
     image: erpuserside/usm_billing

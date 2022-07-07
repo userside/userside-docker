@@ -9,7 +9,7 @@ else
 	DOCKER_COMPOSE = /usr/bin/docker compose -p ${PROJECT_NAME}
 endif
 
-DOCKER_COMPOSE_CRON = ${DOCKER_COMPOSE} -f ${USERSIDE_BASE_DIR}/docker-compose.yml --env-file ${USERSIDE_BASE_DIR}/.env
+DOCKER_COMPOSE_CRON = ${DOCKER_COMPOSE} -f ${USERSIDE_BASE_DIR}/compose.yaml --env-file ${USERSIDE_BASE_DIR}/.env
 
 define INSTALLER_JSON
 {
