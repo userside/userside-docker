@@ -1,4 +1,4 @@
-# ERP USERSIDE Docker Bundle v3.16.9
+# ERP USERSIDE Docker Bundle v3.16.10
 
 ## О проекте
 Данный проект представляет собой **набор образцов** конфигурационных файлов и скриптов для запуска **Docker-бандла** системы ERP USERSIDE. Все необходимые для работы ERP USERSIDE образы уже собраны со всеми необходимыми зависимостями и настройками и размещены в [Docker HUB](https://hub.docker.com/repository/docker/erpuserside/userside). Вы можете на основе данных образцов собрать свой бандл, используя Docker [Compose](https://docs.docker.com/compose/) либо испльзуя другие, удобные вам, инструменты оркестрации. Вы также можете воспользоваться образцами как есть и получить работающую систему ERP USERSIDE без каких либо дополнительных действий. Мы полностью полагаемся на ваше понимание работы контейнеризации в Linux, работы Docker, Docker Compose, Swarm и других систем, которые вы собираетесь использовать.
@@ -146,6 +146,7 @@ sudo rm docker-compose_3-13.yml
 
 #### Вспомогательные команды
 + `bundle-pgsql` — запуск консольной утилиты **psql** для взаимодействия с базой данных (`postgres-psql`)
++ `bundle-pg-postgis-update` — запуск обновления версии PostGis, если это вдруг требуется после обвновления USERSIDE.
 + `bundle-rabbitctl` — запуск консольной утилиты **rabbitmqctl** для управления RabbitMQ
 + `rabbitmq-cleanup` — очистка очередей RabbitMQ (`rabbitmq-cleanup`)
 
