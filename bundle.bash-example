@@ -46,7 +46,7 @@ alias userside-cron-run="${DOCKER_COMPOSE} run --rm php php userside cron"
 
 ## POSTGRESQL
 alias bundle-pgsql="${DOCKER_COMPOSE} exec postgres psql -U ${POSTGRES_USER} -d ${POSTGRES_DB}"
-alias bundle-pg-postgis-update="${DOCKER_COMPOSE} exec postgres psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c \"ALTER EXTENSION postgis UPDATE\""
+alias bundle-pg-postgis-update="${DOCKER_COMPOSE} exec postgres /usr/local/bin/update-postgis.sh"
 
 ## RABBITMQ
 alias bundle-rabbitctl="${DOCKER_COMPOSE} exec rabbitmq rabbitmqctl $1"
@@ -122,7 +122,6 @@ bundle-update () {
     bundle-pull || fail "Error"
     userside-cron-remove || fail "Error"
     bundle-install || fail "Error"
-    bundle-pg-postgis-update || fail "Error"
 }
 
 bundle-destroy () {
