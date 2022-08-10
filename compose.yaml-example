@@ -34,10 +34,6 @@ services:
 
   php:
     image: erpuserside/userside:3.16-php
-    depends_on:
-      - postgres
-      - redis
-      - rabbitmq
     env_file:
       - ${USERSIDE_BASE_DIR}/.env
     volumes:
