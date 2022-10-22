@@ -71,12 +71,28 @@ alias userside-stability="${DOCKER_COMPOSE} run --rm php /app/userside_install.s
 ## USERSIDE COMMANDS
 alias userside-flush-cache="${DOCKER_COMPOSE} run --rm php php userside cache/flush-all"
 
+## DOCKER SERVICE COMMANDS
+awaiting_postgres_tobe_ready() {
+  echo -n "Awaiting for the PostgreSQL."
+  until echo -n "." ; ${DOCKER_COMPOSE} exec -T postgres pg_isready -U ${POSTGRES_USER} --timeout=0 -d ${POSTGRES_DB} -q > /dev/null 2>&1; do sleep 1; done
+  echo "ready!"
+  sleep 1
+}
+
+awaiting_rabbitmq_tobe_ready() {
+  echo -n "Awaiting for the RabbitMQ."
+  until echo -n "." ; curl -f http://172.31.254.1:15672 > /dev/null 2>&1; do sleep 1; done
+  echo "ready!"
+  sleep 1
+}
 
 #########
 ## BUNDLE
 bundle-start () {
     ${DOCKER_COMPOSE} up -d --scale core-worker=${CORE_WORKER_NUM} --scale poller=${POLLER_NUM}
     userside-cron-create
+    awaiting_postgres_tobe_ready
+    awaiting_rabbitmq_tobe_ready
 }
 bundle-stop () {
     userside-cron-remove
@@ -105,8 +121,6 @@ EOT
     fi
 
     bundle-start || fail "Error"
-    echo "Waiting for services to start completely..."
-    sleep 5
     userside-install || fail "Error"
     userside-cron-create || fail "Error"
     userside-cron-run || fail "Error"

@@ -117,6 +117,7 @@ services:
 
   rabbitmq:
     image: erpuserside/userside:3.16-rabbitmq
+    hostname: ${PROJECT_NAME}_rabbitmq
     restart: always
     env_file:
       - ${USERSIDE_BASE_DIR}/.env
