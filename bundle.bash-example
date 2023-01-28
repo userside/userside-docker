@@ -18,7 +18,7 @@ bundle-exit
 
 source .env
 
-DOCKER_COMPOSE="sudo /usr/bin/docker compose -p ${PROJECT_NAME}"
+DOCKER_COMPOSE="sudo docker-compose -f ${USERSIDE_BASE_DIR}/compose.yaml -p ${PROJECT_NAME}"
 DOCKER_COMPOSE_CRON="${DOCKER_COMPOSE} -f ${USERSIDE_BASE_DIR}/compose.yaml --env-file ${USERSIDE_BASE_DIR}/.env"
 
 # Change prompt
