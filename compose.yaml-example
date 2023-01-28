@@ -1,4 +1,6 @@
-services:
+version: "3.5"
+
+ services:
   postgres:
     image: erpuserside/userside:3.16-postgres
     restart: always
