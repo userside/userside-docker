@@ -1,5 +1,4 @@
-[![en](https://img.shields.io/badge/lang-en-green.svg)]
-[![ru](https://img.shields.io/badge/lang-ru-yellow.svg)]
+![en](https://img.shields.io/badge/lang-en-green.svg) ![ru](https://img.shields.io/badge/lang-ru-yellow.svg)
 
 # ERP USERSIDE Docker Bundle v3.16.11 (EN)
 
