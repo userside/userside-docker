@@ -22,7 +22,7 @@ endef
 export INSTALLER_JSON
 
 define CRON_TASKS
-* * * * *    root    ${DOCKER_COMPOSE_CRON} run --rm php php userside cron > /dev/null
+* * * * *    root    ${DOCKER_COMPOSE_CRON} run --rm php php run cron > /dev/null
 0 3 * * *    root    ${DOCKER_COMPOSE_CRON} run --rm php /app/backup.sh > /dev/null
 0 4 * * *    root    ${DOCKER_COMPOSE_CRON} exec postgres /app/backup.sh > /dev/null
 #*/10 * * * *   root    ${DOCKER_COMPOSE_CRON} run --rm usm_billing > /dev/null
@@ -35,14 +35,14 @@ up: bundle-up
 down: bundle-stop
 stop: bundle-stop
 restart: down up
-install: create-init-dirs-and-files bundle-up us-install cron-setup cron-run rabbitmq-cleanup need-restart
-userside-install: us-install
-userside-repair: us-repair
+install: create-init-dirs-and-files bundle-up us-install cron-setup cron-run need-restart
+erp-install: us-install
+erp-repair: us-repair
 update: backup us-cache-flush bundle-stop bundle-pull cron-remove install postgres-postgis-update
 uninstall: bundle-destroy cron-remove
 purge: bundle-destroy cron-remove bundle-purge
 log: bundle-logs
-flush: us-cache-flush rabbitmq-cleanup
+flush: us-cache-flush
 
 #####################################################################
 
@@ -83,7 +83,7 @@ us-repair:
 	${DOCKER_COMPOSE} run --rm php /app/userside_install.sh repair
 
 us-cache-flush:
-	${DOCKER_COMPOSE} run --rm php php userside cache/flush-all
+	${DOCKER_COMPOSE} run --rm php php run cache/flush-all
 
 us-change-stability:
 	${DOCKER_COMPOSE} run --rm php /app/userside_install.sh config --stability=${STABILITY_LEVEL}
@@ -102,17 +102,6 @@ rabbitmq-create-stomp-user:
 	${DOCKER_COMPOSE} exec rabbitmq rabbitmqctl add_user "${STOMP_USER}" "${STOMP_PASSWORD}"
 	${DOCKER_COMPOSE} exec rabbitmq rabbitmqctl set_permissions -p "/" "${STOMP_USER}" "^userside-stomp:id-.*" "" "^userside-stomp:id-.*"
 
-rabbitmq-cleanup: rabbitmq-stop rabbitmq-reset rabbitmq-start
-
-rabbitmq-stop:
-	${DOCKER_COMPOSE} exec rabbitmq rabbitmqctl stop_app
-
-rabbitmq-reset:
-	${DOCKER_COMPOSE} exec rabbitmq rabbitmqctl reset
-
-rabbitmq-start:
-	${DOCKER_COMPOSE} exec rabbitmq rabbitmqctl start_app
-
 ####
 
 backup:
@@ -129,7 +118,7 @@ cron-setup:
 	@echo "$$CRON_TASKS" | sudo tee /etc/cron.d/${PROJECT_NAME}
 
 cron-run:
-	${DOCKER_COMPOSE} run --rm php php userside cron
+	${DOCKER_COMPOSE} run --rm php php run cron
 
 cron-remove:
 	sudo rm -f /etc/cron.d/${PROJECT_NAME}
