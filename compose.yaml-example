@@ -6,7 +6,6 @@ services:
       - ${ERP_BASE_DIR}/.env
     volumes:
       - db:/var/lib/postgresql/data
-      - backup:/backup
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     networks:
@@ -64,11 +63,11 @@ services:
     command: php /app/userside/userside queue/listen
 
   poller:
+    image: erpuserside/usm_poller:3.18
     restart: always
     depends_on:
       - rabbitmq
       - core-worker
-    image: erpuserside/usm_poller:3.18
     env_file:
       - ${ERP_BASE_DIR}/data/userside/.env
     networks:
@@ -146,6 +145,9 @@ services:
       IS_UPDATE_EMPTY_LEVEL: 0 # Flag - Is Update Empty Customer Level
       IS_UPDATE_EMPTY_ENTRANCE: 0 # Flag - Is Update Empty Customer Entrance
       IS_SKIP_UNUSED_ADDRESS: 0 # Flag - Is Skip Unused Address
+      IS_USE_STREET_FULL_NAME: 0 # Flag - use the full name of the imported street (with suffix/prefix)
+      IS_IMPORT_MESSAGE: 0 # Flag - import customer messages (if posible)
+      ALWAYS_SET_CUSTOMER_GROUP_ID: "" # set the group ID for all imported customers
     volumes:
       - ${ERP_BASE_DIR}/data/userside/var/log/usm_billing:/module/log
       - ${ERP_BASE_DIR}/config/datetime.ini:/usr/local/etc/php/conf.d/timezone.ini
