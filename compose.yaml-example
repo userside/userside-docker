@@ -60,7 +60,7 @@ services:
       - /etc/timezone:/etc/timezone:ro
     networks:
       - internal
-    command: php /app/userside/userside queue/listen
+    command: php /app/userside/run queue/listen
 
   poller:
     image: erpuserside/usm_poller:3.18
