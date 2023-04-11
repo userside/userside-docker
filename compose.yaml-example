@@ -79,8 +79,6 @@ services:
         max-size: "20m"
 
   nginx:
-    depends_on:
-      - fpm
     image: erpuserside/userside:3.18-nginx
     restart: always
     ports:
@@ -89,6 +87,8 @@ services:
       - www:/app/userside
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
+    depends_on:
+      - fpm
     networks:
       - internal
     logging:
@@ -174,6 +174,7 @@ volumes:
       o: bind
   redis:
   rabbitmq:
+
 
 networks:
   internal:

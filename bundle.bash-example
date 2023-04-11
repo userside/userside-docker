@@ -1,3 +1,5 @@
+DOCKER_HOST_IP="172.31.254.1"
+
 if [ "${BASH_SOURCE-}" = "$0" ]; then
     echo "You must source this script: \$ source $0" >&2
     exit 33
@@ -32,10 +34,17 @@ fi
 export PS1
 
 ## POSTGRESQL
-alias pgsql="${DOCKER_COMPOSE} exec postgres psql -U ${POSTGRES_USER} -d ${POSTGRES_DB}"
+alias psql="${DOCKER_COMPOSE} exec postgres psql -U ${POSTGRES_USER} -d ${POSTGRES_DB}"
 alias database-postgis-update="${DOCKER_COMPOSE} exec postgres update-postgis.sh"
 alias database-backup="${DOCKER_COMPOSE} exec postgres pg_dump -U ${POSTGRES_USER} --no-acl -Fp -Z 5 ${POSTGRES_DB}"
-alias database-backup-to-file="database-backup > ${ERP_BASE_DIR}/data/backup/userside_db_$(date "+%Y-%m-%d_%H-%M").sql.gz"
+alias database-backup-to-file="database-backup | sudo tee ${ERP_BASE_DIR}/data/backup/userside_db_$(date "+%Y-%m-%d_%H-%M").sql.gz > /dev/null"
+database-restore () {
+  if file --mime-type "$1" | grep -q gzip$; then
+    gunzip < $1 | ${DOCKER_COMPOSE} exec -T postgres psql -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+  else
+    cat $1 | ${DOCKER_COMPOSE} exec -T postgres psql -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+  fi
+}
 
 ## BACKUP
 backup-make () {
@@ -74,6 +83,7 @@ alias erp-stability="${DOCKER_COMPOSE} run --rm php /app/userside_install.sh con
 
 ## USERSIDE COMMANDS
 alias erp-flush-cache="${DOCKER_COMPOSE} run --rm php php run cache/flush-all"
+alias erp-migrate="${DOCKER_COMPOSE} run --rm php php run migrate/up --interactive=0"
 
 ## DOCKER SERVICE COMMANDS
 awaiting_postgres_tobe_ready() {
@@ -85,7 +95,7 @@ awaiting_postgres_tobe_ready() {
 
 awaiting_rabbitmq_tobe_ready() {
   echo -n "Awaiting for the RabbitMQ."
-  until echo -n "." ; curl -f http://172.31.254.1:15672 > /dev/null 2>&1; do sleep 1; done
+  until echo -n "." ; curl -f http://${DOCKER_HOST_IP}:15672 > /dev/null 2>&1; do sleep 2; done
   echo "ready!"
   sleep 1
 }
@@ -134,8 +144,11 @@ EOT
 
 bundle-update () {
     fail() { : "${__fail_fast:?$1}"; }
+    if [[ $1 == 'force' ]];
+    then
+        sudo rm data/userside/.installer/crash.txt
+    fi
     backup-make || fail "Error"
-    erp-flush-cache || fail "Error"
     bundle-stop || fail "Error"
     bundle-pull || fail "Error"
     cron-remove || fail "Error"
@@ -152,4 +165,3 @@ bundle-destroy () {
 }
 
 alias bundle-purge="bundle-destroy && sudo rm --rf ${ERP_BASE_DIR}/data/userside ${ERP_BASE_DIR}/data/db"
-
