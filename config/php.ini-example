@@ -4,5 +4,5 @@ cgi.fix_pathinfo=0
 
 post_max_size = 128M
 upload_max_filesize = 128M
-max_execution_time = 240
-max_input_time = 240
+max_execution_time = 300
+max_input_time = 300
