@@ -151,6 +151,7 @@ services:
     volumes:
       - ${ERP_BASE_DIR}/data/userside/var/log/usm_billing:/module/log
       - ${ERP_BASE_DIR}/config/datetime.ini:/usr/local/etc/php/conf.d/timezone.ini
+      # - ${ERP_BASE_DIR}/config/usm_billing_config.php:/module/usm_billing_config.php
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     networks:
