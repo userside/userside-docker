@@ -151,8 +151,8 @@ EOT
     database-postgis-update > /dev/null || fail "Error"
     erp-install || fail "Error"
     cron-create || fail "Error"
-    cron-run || fail "Error"
     bundle-restart || fail "Error"
+    cron-run
 }
 
 bundle-update () {
