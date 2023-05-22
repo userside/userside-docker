@@ -325,6 +325,7 @@ Most of the commands used are enclosed in the `bundle.bash` file as aliases or f
 #### Additional commands
 + `psql` — running the console utility **psql** to interact with the database
 + `rabbitmqctl` — running the console utility **rabbitmqctl** to control RabbitMQ
++ `erp-stability beta` — setting the stability level settings for the installer tool
 
 ### Backup
 The auto-deployment script installs and configures all necessary system components, including periodic backups (the job is set to the system cron). The archives are located in the **data/backup** subdirectory of the bundle.
@@ -743,6 +744,7 @@ sudo rm docker-compose_3-13.yml
 #### Вспомогательные команды
 + `psql` — запуск консольной утилиты **psql** для взаимодействия с базой данных
 + `rabbitmqctl` — запуск консольной утилиты **rabbitmqctl** для управления RabbitMQ
++ `erp-stability beta` — настройка уровня стабильности userside для инструмента инсталлятора
 
 ### Резервное копирование
 Сценарием автоматического развёртывания устанавливаются и настраиваются все необходимые компоненты системы, в том числе периодическое резервное копирование (задание помещается в системный cron). Архивы размещаются в подкаталоге **data/backup** бандла.
