@@ -213,6 +213,11 @@ As the `bundle.bash` file is significantly different from the one originally loa
 source bundle.bash
 ```
 
+Since version 3.18 is currently in the *Beta* stage, it is necessary to lower the stability level of releases in the installer settings:
+```
+erp-stability beta
+```
+
 Now the postgres service needs to be started. First make sure that the correct locale, database name, username and password are specified in `.env` and after that, run:
 ```
 ${DOCKER_COMPOSE} up postgres -d
@@ -630,6 +635,11 @@ sudo cp compose.yaml-example compose.yaml
 Так как файл `bundle.bash` значительно отличается от того, который был загружен вначале, перед тем как продолжить, необходимо чтобы эти изменения отразились и в сеансе оболочки. Для этого вам придется выйти из сеанса оболочки и затем войти снова. После этого загрузите обновленный файл:
 ```
 source bundle.bash
+```
+
+Так как на данный момент версия 3.18 находится в стадии *Beta*, необходимо понизить уровень стабильности релизов в настройках инсталлятора:
+```
+erp-stability beta
 ```
 
 Теперь нужно запустить службу postgres. Сначала убедитесь, что в `.env` указана верная локаль, имя базы данных, имя пользователя и пароль и после этого выполните:
