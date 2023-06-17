@@ -1,94 +1,84 @@
 services:
   postgres:
-    image: erpuserside/userside:3.16-postgres
+    image: erpuserside/userside:3.18-postgres
     restart: always
     env_file:
-      - ${USERSIDE_BASE_DIR}/.env
+      - ${ERP_BASE_DIR}/.env
     volumes:
       - db:/var/lib/postgresql/data
-      - backup:/backup
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     networks:
       - internal
 
   fpm:
-    image: erpuserside/userside:3.16-fpm
+    image: erpuserside/userside:3.18-fpm
     restart: always
     depends_on:
       - postgres
       - redis
       - rabbitmq
     env_file:
-      - ${USERSIDE_BASE_DIR}/.env
+      - ${ERP_BASE_DIR}/.env
     volumes:
       - www:/app/userside
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-      - ${USERSIDE_BASE_DIR}/config/datetime.ini:/usr/local/etc/php/conf.d/timezone.ini
-      #- ${USERSIDE_BASE_DIR}/config/php.ini:/usr/local/etc/php/php.ini
-      #- ${USERSIDE_BASE_DIR}/config/error.ini:/usr/local/etc/php/conf.d/error.ini
-      #- ${USERSIDE_BASE_DIR}/config/www.conf:/usr/local/etc/php-fpm.d/www.conf
+      - ${ERP_BASE_DIR}/config/datetime.ini:/usr/local/etc/php/conf.d/timezone.ini
+      #- ${ERP_BASE_DIR}/config/php.ini:/usr/local/etc/php/php.ini
+      #- ${ERP_BASE_DIR}/config/error.ini:/usr/local/etc/php/conf.d/error.ini
+      #- ${ERP_BASE_DIR}/config/www.conf:/usr/local/etc/php-fpm.d/www.conf
     networks:
       - internal
 
   php:
-    image: erpuserside/userside:3.16-php
+    image: erpuserside/userside:3.18-php
     env_file:
-      - ${USERSIDE_BASE_DIR}/.env
+      - ${ERP_BASE_DIR}/.env
     volumes:
       - www:/app/userside
       - backup:/backup
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-      - ${USERSIDE_BASE_DIR}/config/datetime.ini:/usr/local/etc/php/conf.d/timezone.ini
-      #- ${USERSIDE_BASE_DIR}/config/php.ini:/usr/local/etc/php/php.ini
+      - ${ERP_BASE_DIR}/config/datetime.ini:/usr/local/etc/php/conf.d/timezone.ini
+      #- ${ERP_BASE_DIR}/config/php.ini:/usr/local/etc/php/php.ini
     networks:
       - internal
 
   core-worker:
-    image: erpuserside/userside:3.16-php
+    image: erpuserside/userside:3.18-php
     restart: always
     depends_on:
       - postgres
       - redis
       - rabbitmq
     env_file:
-      - ${USERSIDE_BASE_DIR}/.env
+      - ${ERP_BASE_DIR}/.env
     volumes:
       - www:/app/userside
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     networks:
       - internal
-    command: php /app/userside/userside queue/listen
+    command: php /app/userside/run queue/listen
+    deploy:
+      replicas: 10
 
   poller:
+    image: erpuserside/usm_poller:3.18
     restart: always
     depends_on:
       - rabbitmq
       - core-worker
-    image: erpuserside/userside:3.16-poller
     env_file:
-      - ${USERSIDE_BASE_DIR}/data/userside/.env
-    environment:
-      US_POLLER_LOGFILE: /dev/stdout
-    volumes:
-      - ${USERSIDE_BASE_DIR}/data/userside/microservice/poller:/app
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      - ${ERP_BASE_DIR}/data/userside/.env
     networks:
       - internal
-    logging:
-      driver: "json-file"
-      options:
-        max-file: "10"
-        max-size: "20m"
+    deploy:
+      replicas: 10
 
   nginx:
-    depends_on:
-      - fpm
-    image: erpuserside/userside:3.16-nginx
+    image: erpuserside/userside:3.18-nginx
     restart: always
     ports:
       - "172.31.254.1:8080:80"
@@ -96,6 +86,8 @@ services:
       - www:/app/userside
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
+    depends_on:
+      - fpm
     networks:
       - internal
     logging:
@@ -116,11 +108,11 @@ services:
     command: redis-server --requirepass ${REDIS_PASSWORD}
 
   rabbitmq:
-    image: erpuserside/userside:3.16-rabbitmq
+    image: erpuserside/userside:3.18-rabbitmq
     hostname: ${PROJECT_NAME}_rabbitmq
     restart: always
     env_file:
-      - ${USERSIDE_BASE_DIR}/.env
+      - ${ERP_BASE_DIR}/.env
     volumes:
       - rabbitmq:/var/lib/rabbitmq
       - /etc/localtime:/etc/localtime:ro
@@ -152,9 +144,13 @@ services:
       IS_UPDATE_EMPTY_LEVEL: 0 # Flag - Is Update Empty Customer Level
       IS_UPDATE_EMPTY_ENTRANCE: 0 # Flag - Is Update Empty Customer Entrance
       IS_SKIP_UNUSED_ADDRESS: 0 # Flag - Is Skip Unused Address
+      IS_USE_STREET_FULL_NAME: 0 # Flag - use the full name of the imported street (with suffix/prefix)
+      IS_IMPORT_MESSAGE: 0 # Flag - import customer messages (if posible)
+      ALWAYS_SET_CUSTOMER_GROUP_ID: "" # set the group ID for all imported customers
     volumes:
-      - ${USERSIDE_BASE_DIR}/data/userside/var/log/usm_billing:/module/log
-      - ${USERSIDE_BASE_DIR}/config/datetime.ini:/usr/local/etc/php/conf.d/timezone.ini
+      - ${ERP_BASE_DIR}/data/userside/var/log/usm_billing:/module/log
+      - ${ERP_BASE_DIR}/config/datetime.ini:/usr/local/etc/php/conf.d/timezone.ini
+      # - ${ERP_BASE_DIR}/config/usm_billing_config.php:/module/usm_billing_config.php
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     networks:
@@ -164,20 +160,21 @@ volumes:
   www:
     driver_opts:
       type: none
-      device: ${USERSIDE_BASE_DIR}/data/userside
+      device: ${ERP_BASE_DIR}/data/userside
       o: bind
   backup:
     driver_opts:
       type: none
-      device: ${USERSIDE_BASE_DIR}/data/backup
+      device: ${ERP_BASE_DIR}/data/backup
       o: bind
   db:
     driver_opts:
       type: none
-      device: ${USERSIDE_BASE_DIR}/data/db
+      device: ${ERP_BASE_DIR}/data/db
       o: bind
   redis:
   rabbitmq:
+
 
 networks:
   internal:
