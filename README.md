@@ -77,8 +77,6 @@
 
 # ERP USERSIDE Docker Bundle v3.18.1 (EN)
 
-**Warning!** Version 3.18 of this bundle has *Beta* status and may contain inaccuracies and bugs. Please do not update the production servers until this version has reached stable release status.
-
 ## About the project
 This project is a **sample set** of configuration files and scripts to run the **Docker bundle** of the ERP USERSIDE system. All the images required for ERP USERSIDE are already built with all the necessary dependencies and settings and are located in [Docker HUB](https://hub.docker.com/repository/docker/erpuserside/userside). You can build your own bundle from these samples using Docker [Compose] (https://docs.docker.com/compose/) or using other orchestration tools of your choice. You can also use the samples as is and get a working ERP USERSIDE system without any further steps. We fully rely on your understanding of containerisation in Linux, Docker, Docker Compose, Swarm and the other systems you intend to use.
 
@@ -168,10 +166,8 @@ This command will stop and remove all containers, including all mounted volumes:
 ${DOCKER_COMPOSE} down -v --remove-orphans
 ```
 
-Until the userside 3.18 stable release, the current Docker bundle branch v3.18 also has a *Beta* status and has not yet been pushed into the master branch. For this reason, you should switch to the v3.18 branch before upgrading, and when the release comes out, you can switch back to the master branch:
+Pull updates from repository:
 ```
-sudo git fetch
-sudo git checkout v3.18
 sudo git pull
 ```
 
@@ -211,11 +207,6 @@ If you had to change the subnet for the bundle (`subnet` in the `networks` setti
 As the `bundle.bash` file is significantly different from the one originally loaded, before proceeding, you should ensure that these changes are reflected in the shell session as well. To do this, you will have to log out of your shell session and then log in again. Once you have done this, upload the updated file:
 ```
 source bundle.bash
-```
-
-Since version 3.18 is currently in the *Beta* stage, it is necessary to lower the stability level of releases in the installer settings:
-```
-erp-stability beta
 ```
 
 Now the postgres service needs to be started. First make sure that the correct locale, database name, username and password are specified in `.env` and after that, run:
@@ -501,8 +492,6 @@ Feedback, suggestions and bug reports about this Docker environment for USERSIDE
 
 # ERP USERSIDE Docker Bundle v3.18.1 (RU)
 
-**Внимание!** Версия бандла 3.18 имеет статус *Beta* и может содержать неточности и ошибки. Пожалуйста, не обновляйте производственные серверы, пока эта версия не получит статуст стабильного релиза.
-
 ## О проекте
 Данный проект представляет собой **набор образцов** конфигурационных файлов и скриптов для запуска **Docker-бандла** системы ERP USERSIDE. Все необходимые для работы ERP USERSIDE образы уже собраны со всеми необходимыми зависимостями и настройками и размещены в [Docker HUB](https://hub.docker.com/repository/docker/erpuserside/userside). Вы можете на основе данных образцов собрать свой бандл, используя Docker [Compose](https://docs.docker.com/compose/) либо испльзуя другие, удобные вам, инструменты оркестрации. Вы также можете воспользоваться образцами как есть и получить работающую систему ERP USERSIDE без каких либо дополнительных действий. Мы полностью полагаемся на ваше понимание работы контейнеризации в Linux, работы Docker, Docker Compose, Swarm и других систем, которые вы собираетесь использовать.
 
@@ -592,10 +581,8 @@ bundle-stop
 ${DOCKER_COMPOSE} down -v --remove-orphans
 ```
 
-До выпуска стабильного релиза userside 3.18, текущая ветка Docker-бандла v3.18 также имеет стутс *Beta* и еще не влита в ветку master. По этой причине, перед обновлением, вам необходимо переключиться на ветку v3.18, а когда выйдет релиз, можно будет вернуться к ветке master:
+Обновите локальную копию из репозитория:
 ```
-sudo git fetch
-sudo git checkout v3.18
 sudo git pull
 ```
 
@@ -635,11 +622,6 @@ sudo cp compose.yaml-example compose.yaml
 Так как файл `bundle.bash` значительно отличается от того, который был загружен вначале, перед тем как продолжить, необходимо чтобы эти изменения отразились и в сеансе оболочки. Для этого вам придется выйти из сеанса оболочки и затем войти снова. После этого загрузите обновленный файл:
 ```
 source bundle.bash
-```
-
-Так как на данный момент версия 3.18 находится в стадии *Beta*, необходимо понизить уровень стабильности релизов в настройках инсталлятора:
-```
-erp-stability beta
 ```
 
 Теперь нужно запустить службу postgres. Сначала убедитесь, что в `.env` указана верная локаль, имя базы данных, имя пользователя и пароль и после этого выполните:

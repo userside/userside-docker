@@ -49,7 +49,7 @@ database-restore () {
 ## BACKUP
 backup-make () {
     database-backup-to-file
-	${DOCKER_COMPOSE} run --rm php /app/backup.sh
+    ${DOCKER_COMPOSE} run --rm php /app/backup.sh
 }
 
 ## CRON
@@ -98,15 +98,21 @@ alias erp-migrate="${DOCKER_COMPOSE} run --rm php php run migrate/up --interacti
 
 ## DOCKER SERVICE COMMANDS
 awaiting_postgres_tobe_ready() {
-  echo -n "Awaiting for the PostgreSQL."
-  until echo -n "." ; ${DOCKER_COMPOSE} exec -T postgres pg_isready -U ${POSTGRES_USER} --timeout=0 -d ${POSTGRES_DB} -q > /dev/null 2>&1; do sleep 1; done
+  echo -n "Waiting for PostgreSQL."
+  until
+    echo -n "."
+    ${DOCKER_COMPOSE} exec -T postgres pg_isready -U ${POSTGRES_USER} --timeout=0 -d ${POSTGRES_DB} -q > /dev/null 2>&1
+  do sleep 1; done
   echo "ready!"
   sleep 1
 }
 
 awaiting_rabbitmq_tobe_ready() {
-  echo -n "Awaiting for the RabbitMQ."
-  until echo -n "." ; curl -f http://${DOCKER_HOST_IP}:15672 > /dev/null 2>&1; do sleep 2; done
+  echo -n "Waiting for RabbitMQ."
+  until
+    echo -n "."
+    curl -f http://${DOCKER_HOST_IP}:15672 > /dev/null 2>&1
+  do sleep 2; done
   echo "ready!"
   sleep 1
 }

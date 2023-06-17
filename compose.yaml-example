@@ -61,6 +61,8 @@ services:
     networks:
       - internal
     command: php /app/userside/run queue/listen
+    deploy:
+      replicas: 10
 
   poller:
     image: erpuserside/usm_poller:3.18
@@ -72,11 +74,8 @@ services:
       - ${ERP_BASE_DIR}/data/userside/.env
     networks:
       - internal
-    logging:
-      driver: "json-file"
-      options:
-        max-file: "10"
-        max-size: "20m"
+    deploy:
+      replicas: 10
 
   nginx:
     image: erpuserside/userside:3.18-nginx
