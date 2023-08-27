@@ -485,6 +485,12 @@ server {
 }
 ```
 
+For each copy, add to the `data/userside/.env` file the `US_REVERSE_PROXY_TRUSTED_HOSTS` environment variable whose value should contain the IP address of the NGINX host on which the reverse proxy is running. In this example, for the first copy, this would be the address 172.31.254.1, and for the second copy, 172.31.254.129, respectively. As follows:
+```
+US_REVERSE_PROXY_TRUSTED_HOSTS=172.31.254.1
+```
+It is allowed to specify both an IP address and a subnet. It is also allowed to specify a comma-separated list of addresses and subnets.
+
 ## Additions and corrections
 Feedback, suggestions and bug reports about this Docker environment for USERSIDE are appreciated. You can report them through the Issue system of this repository. Suggestions and corrections in the form of Poll Request are also welcome.
 
@@ -899,6 +905,12 @@ server {
     }
 }
 ```
+
+В файл `data/userside/.env` каждой копии добавьте переменную окружения `US_REVERSE_PROXY_TRUSTED_HOSTS` в значении которой укажите IP-адрес хоста с NGINX, на котором работает реверсивный прокси. В данном примере для первой копии это будет адрес 172.31.254.1, а для второй, соответственно, 172.31.254.129. Вот так:
+```
+US_REVERSE_PROXY_TRUSTED_HOSTS=172.31.254.1
+```
+Можно указывать как IP-адрес, так и подсеть. Также можно указывать список адресов и подсетей, разделенных запятыми.
 
 ## Дополнения и исправления
 Будем благодарны за обратную связь, предложения и сообщения о найденых ошибках в данном Docker-окружении для USERSIDE. О них Вы можете сообщать через Issue систему этого репозитория. Также будем рады предложениям и исправлениям в виде Poll Request.
