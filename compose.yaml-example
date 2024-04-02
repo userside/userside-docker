@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: erpuserside/userside:3.18-postgres
+    image: erpuserside/userside:3.19-postgres
     restart: always
     env_file:
       - ${ERP_BASE_DIR}/.env
@@ -12,7 +12,7 @@ services:
       - internal
 
   fpm:
-    image: erpuserside/userside:3.18-fpm
+    image: erpuserside/userside:3.19-fpm
     restart: always
     depends_on:
       - postgres
@@ -32,7 +32,7 @@ services:
       - internal
 
   php:
-    image: erpuserside/userside:3.18-php
+    image: erpuserside/userside:3.19-php
     env_file:
       - ${ERP_BASE_DIR}/.env
     volumes:
@@ -46,7 +46,7 @@ services:
       - internal
 
   core-worker:
-    image: erpuserside/userside:3.18-php
+    image: erpuserside/userside:3.19-php
     restart: always
     depends_on:
       - postgres
@@ -65,7 +65,7 @@ services:
       replicas: 10
 
   poller:
-    image: erpuserside/usm_poller:3.18
+    image: erpuserside/usm_poller:3.19
     restart: always
     depends_on:
       - rabbitmq
@@ -78,7 +78,7 @@ services:
       replicas: 10
 
   nginx:
-    image: erpuserside/userside:3.18-nginx
+    image: erpuserside/userside:3.19-nginx
     restart: always
     ports:
       - "172.31.254.1:8080:80"
@@ -108,7 +108,7 @@ services:
     command: redis-server --requirepass ${REDIS_PASSWORD}
 
   rabbitmq:
-    image: erpuserside/userside:3.18-rabbitmq
+    image: erpuserside/userside:3.19-rabbitmq
     hostname: ${PROJECT_NAME}_rabbitmq
     restart: always
     env_file:
