@@ -82,7 +82,7 @@ rabbitmq-create-stomp-user () {
     read -p "WebSocket username: " -r STOMP_USER
     read -p "WebSocket password: " -s -r STOMP_PASSWORD
     rabbitmqctl add_user "${STOMP_USER}" "${STOMP_PASSWORD}"
-    rabbitmqctl set_permissions -p "/" "${STOMP_USER}" "^userside-stomp:id-.*" "" "^userside-stomp:id-.*"
+    rabbitmqctl set_permissions -p "/" "${STOMP_USER}" "^erp-stomp:id-.*" "" "^erp-stomp:id-.*"
     echo
     echo "Done"
 }
