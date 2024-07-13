@@ -103,7 +103,7 @@ sudo mkdir -p /docker && cd $_
 ```
 4. Clone this repository into the userside subdirectory and navigate to it:
 ```
-sudo git clone --depth 1 --branch=v3.18 https://github.com/userside/userside-docker.git userside && cd userside
+sudo git clone --depth 1 --branch=v3.19 https://github.com/userside/userside-docker.git userside && cd userside
 ```
 5. Run the initialise bundle config command - this will create copies of the samples with working filenames. You now have the files **.env**, **compose.yaml**, **bundle.bash**.
 ```
@@ -136,7 +136,45 @@ bundle-update
 ```
 
 ### Upgrade from Docker bundle version 3.18 to version 3.19
+#### If you have bandle 3.16
+> [!WARNING] 
+> If you are upgrading from a version 3.16 bundle, it is obligatory to make a backup copy of the database and then restore it after the bundle upgrade, because the PostgreSQL version differs between the 3.16 and 3.18 bundles.
+> But if you have current bandle version 3.18, you don't need to do this - Postgres versions don't differ between 3.18 and 3.19.
 
+#### Upgrade procedure
+Update the repository information and stop the Docker bundle from running.
+```shell
+sudo git fetch
+source alias.bash
+bundle-stop
+```
+
+If you cloned a repository with a branch other than master (for example, using the parameter `--branch=v3.18`), then switch to branch 3.19.
+```shell
+git switch v3.19
+```
+If you cloned a repository without specifying a particular branch, then just continue on from there.
+
+Update the branch information and reconnect alias.bash to the shell:
+```shell
+sudo git pull
+source alias.bash
+```
+
+Edit your file `compose.yaml` — specify the versions of Docker images according to the example from `compose.yaml-example` (change 3.18 to 3.19).
+
+You can proceed with the upgrade. Run the update command and follow the instructions:
+```shell
+bundle-update
+```
+
+After the upgrade, re-create the user for websocket, as its settings are different in USERSIDE 3.19:
+```shell
+rabbitmq-create-stomp-user
+```
+In the USERSIDE WEB-interface navigate to Settings - Main - WebSocket and specify the name and password of the newly created user.
+
+The upgrade is now complete.
 
 ### Upgrade from Docker bundle version 3.16 to version 3.18
 Before upgrading something, back up the files as usual and then **must** back up the database to an SQL script - it will be required later:
