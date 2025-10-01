@@ -1,9 +1,9 @@
-[![EN](https://img.shields.io/badge/lang-en-green.svg)](#erp-userside-docker-bundle-v3191-en)
-[![RU](https://img.shields.io/badge/lang-ru-yellow.svg)](#erp-userside-docker-bundle-v3191-ru)
+[![EN](https://img.shields.io/badge/lang-en-green.svg)](#erp-userside-docker-bundle-v3192-en)
+[![RU](https://img.shields.io/badge/lang-ru-yellow.svg)](#erp-userside-docker-bundle-v3192-ru)
 
 # Table of contents
 - [Table of contents](#table-of-contents)
-- [ERP USERSIDE Docker Bundle v3.19.1 (EN)](#erp-userside-docker-bundle-v3191-en)
+- [ERP USERSIDE Docker Bundle v3.19.2 (EN)](#erp-userside-docker-bundle-v3192-en)
   - [About the project](#about-the-project)
   - [Installation](#installation)
   - [Updating](#updating)
@@ -39,7 +39,7 @@
         - [File compose.yaml](#file-composeyaml-1)
     - [Reverse HTTP proxy](#reverse-http-proxy)
   - [Additions and corrections](#additions-and-corrections)
-- [ERP USERSIDE Docker Bundle v3.19.1 (RU)](#erp-userside-docker-bundle-v3191-ru)
+- [ERP USERSIDE Docker Bundle v3.19.2 (RU)](#erp-userside-docker-bundle-v3192-ru)
   - [О проекте](#о-проекте)
   - [Установка](#установка)
   - [Обновление](#обновление)
@@ -79,7 +79,7 @@
   - [Дополнения и исправления](#дополнения-и-исправления)
 
 
-# ERP USERSIDE Docker Bundle v3.19.1 (EN)
+# ERP USERSIDE Docker Bundle v3.19.2 (EN)
 
 ## About the project
 This project is a **sample set** of configuration files and scripts to run the **Docker bundle** of the ERP USERSIDE system. All the images required for ERP USERSIDE are already built with all the necessary dependencies and settings and are located in [Docker HUB](https://hub.docker.com/repository/docker/erpuserside/userside). You can build your own bundle from these samples using Docker [Compose] (https://docs.docker.com/compose/) or using other orchestration tools of your choice. You can also use the samples as is and get a working ERP USERSIDE system without any further steps. We fully rely on your understanding of containerisation in Linux, Docker, Docker Compose, Swarm and the other systems you intend to use.
@@ -541,7 +541,7 @@ Feedback, suggestions and bug reports about this Docker environment for USERSIDE
 
 ---
 
-# ERP USERSIDE Docker Bundle v3.19.1 (RU)
+# ERP USERSIDE Docker Bundle v3.19.2 (RU)
 
 ## О проекте
 Данный проект представляет собой **набор образцов** конфигурационных файлов и скриптов для запуска **Docker-бандла** системы ERP USERSIDE. Все необходимые для работы ERP USERSIDE образы уже собраны со всеми необходимыми зависимостями и настройками и размещены в [Docker HUB](https://hub.docker.com/repository/docker/erpuserside/userside). Вы можете на основе данных образцов собрать свой бандл, используя Docker [Compose](https://docs.docker.com/compose/) либо испльзуя другие, удобные вам, инструменты оркестрации. Вы также можете воспользоваться образцами как есть и получить работающую систему ERP USERSIDE без каких либо дополнительных действий. Мы полностью полагаемся на ваше понимание работы контейнеризации в Linux, работы Docker, Docker Compose, Swarm и других систем, которые вы собираетесь использовать.
