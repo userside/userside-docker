@@ -135,10 +135,10 @@ alias bundle-pull="${DOCKER_COMPOSE} pull"
 
 bundle-install () {
     fail() { : "${__fail_fast:?$1}"; }
-    sudo mkdir -p ${ERP_BASE_DIR}/data/db ${ERP_BASE_DIR}/data/backup ${ERP_BASE_DIR}/data/userside
+    sudo mkdir -p ${ERP_BASE_DIR}/data/db ${ERP_BASE_DIR}/data/backup ${ERP_BASE_DIR}/data/userside ${ERP_BASE_DIR}/data/log
     sudo mkdir -p ${ERP_BASE_DIR}/data/userside/var/attachments ${ERP_BASE_DIR}/data/userside/var/cache ${ERP_BASE_DIR}/data/userside/var/log
     sudo mkdir -p ${ERP_BASE_DIR}/data/userside/var/log/usm_billing
-    sudo chmod -R u=rwX,g=rwX,o=rwX ${ERP_BASE_DIR}/data/userside/var
+    sudo chmod -R u=rwX,g=rwX,o=rwX ${ERP_BASE_DIR}/data/userside/var ${ERP_BASE_DIR}/data/backup ${ERP_BASE_DIR}/data/log
 
     test -f ${ERP_BASE_DIR}/data/userside/.env || echo "" | sudo tee ${ERP_BASE_DIR}/data/userside/.env > /dev/null
 

@@ -147,7 +147,7 @@ services:
       IS_IMPORT_MESSAGE: 0 # Flag - import customer messages (if posible)
       ALWAYS_SET_CUSTOMER_GROUP_ID: "" # set the group ID for all imported customers
     volumes:
-      - ${ERP_BASE_DIR}/data/userside/var/log/usm_billing:/module/log
+      - ${ERP_BASE_DIR}/data/log/usm_billing:/module/log
       - ${ERP_BASE_DIR}/config/datetime.ini:/usr/local/etc/php/conf.d/timezone.ini
       # - ${ERP_BASE_DIR}/config/usm_billing_config.php:/module/usm_billing_config.php
       - /etc/localtime:/etc/localtime:ro
