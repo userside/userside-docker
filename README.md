@@ -1,14 +1,18 @@
-[![EN](https://img.shields.io/badge/lang-en-green.svg)](#erp-userside-docker-bundle-v3192-en)
-[![RU](https://img.shields.io/badge/lang-ru-yellow.svg)](#erp-userside-docker-bundle-v3192-ru)
+[![EN](https://img.shields.io/badge/lang-en-green.svg)](#erp-userside-docker-bundle-v3210-en)
+[![RU](https://img.shields.io/badge/lang-ru-yellow.svg)](#erp-userside-docker-bundle-v3210-ru)
 
 # Table of contents
 - [Table of contents](#table-of-contents)
-- [ERP USERSIDE Docker Bundle v3.19.3 (EN)](#erp-userside-docker-bundle-v3192-en)
+- [ERP USERSIDE Docker Bundle v3.21.0 (EN)](#erp-userside-docker-bundle-v3210-en)
   - [About the project](#about-the-project)
   - [Installation](#installation)
   - [Updating](#updating)
-    - [Within Docker bundle version 3.16, 3.18 or 3.19](#within-docker-bundle-version-316-318-or-319)
+    - [Within Docker bundle version](#within-docker-bundle-version)
+    - [Upgrade from Docker bundle version 3.19 to version 3.21](#upgrade-from-docker-bundle-version-319-to-version-321)
+      - [Upgrade procedure](#upgrade-procedure)
     - [Upgrade from Docker bundle version 3.18 to version 3.19](#upgrade-from-docker-bundle-version-318-to-version-319)
+      - [If you have bundle 3.16](#if-you-have-bundle-316)
+      - [Upgrade procedure](#upgrade-procedure-1)
     - [Upgrade from Docker bundle version 3.16 to version 3.18](#upgrade-from-docker-bundle-version-316-to-version-318)
       - [Configuration files](#configuration-files)
         - [file .env](#file-env)
@@ -39,14 +43,16 @@
         - [File compose.yaml](#file-composeyaml-1)
     - [Reverse HTTP proxy](#reverse-http-proxy)
   - [Additions and corrections](#additions-and-corrections)
-- [ERP USERSIDE Docker Bundle v3.19.3 (RU)](#erp-userside-docker-bundle-v3192-ru)
+- [ERP USERSIDE Docker Bundle v3.21.0 (RU)](#erp-userside-docker-bundle-v3210-ru)
   - [О проекте](#о-проекте)
   - [Установка](#установка)
   - [Обновление](#обновление)
-    - [В пределах версий Docker-бандла 3.16, 3.18 или 3.19](#в-пределах-версий-docker-бандла-316-318-или-319)
+    - [В пределах версий Docker-бандла](#в-пределах-версий-docker-бандла)
+    - [Обновление с версии Docker-бандла 3.19 на версию 3.21](#обновление-с-версии-docker-бандла-319-на-версию-321)
+      - [Процедура обновления](#процедура-обновления)
     - [Обновление с версии Docker-бандла 3.18 на версию 3.19](#обновление-с-версии-docker-бандла-318-на-версию-319)
       - [Если у вас версия бандла 3.16](#если-у-вас-версия-бандла-316)
-      - [Процедура обновления](#процедура-обновления)
+      - [Процедура обновления](#процедура-обновления-1)
     - [Обновление с версии Docker-бандла 3.16 на версию 3.18](#обновление-с-версии-docker-бандла-316-на-версию-318)
       - [Конфигурационные файлы](#конфигурационные-файлы)
         - [файл .env](#файл-env)
@@ -79,7 +85,7 @@
   - [Дополнения и исправления](#дополнения-и-исправления)
 
 
-# ERP USERSIDE Docker Bundle v3.19.3 (EN)
+# ERP USERSIDE Docker Bundle v3.21.0 (EN)
 
 ## About the project
 This project is a **sample set** of configuration files and scripts to run the **Docker bundle** of the ERP USERSIDE system. All the images required for ERP USERSIDE are already built with all the necessary dependencies and settings and are located in [Docker HUB](https://hub.docker.com/repository/docker/erpuserside/userside). You can build your own bundle from these samples using Docker [Compose] (https://docs.docker.com/compose/) or using other orchestration tools of your choice. You can also use the samples as is and get a working ERP USERSIDE system without any further steps. We fully rely on your understanding of containerisation in Linux, Docker, Docker Compose, Swarm and the other systems you intend to use.
@@ -103,7 +109,7 @@ sudo mkdir -p /docker && cd $_
 ```
 4. Clone this repository into the userside subdirectory and navigate to it:
 ```
-sudo git clone --depth 1 --branch=v3.19 https://github.com/userside/userside-docker.git userside && cd userside
+sudo git clone --depth 1 --branch=v3.21 https://github.com/userside/userside-docker.git userside && cd userside
 ```
 5. Run the initialise bundle config command - this will create copies of the samples with working filenames. You now have the files **.env**, **compose.yaml**, **bundle.bash**.
 ```
@@ -129,17 +135,52 @@ The WebSTOMP user name and password are specified in USERSIDE in the menu: Setti
 
 ## Updating
 
-### Within Docker bundle version 3.16, 3.18 or 3.19
-No further steps are required to update ERP USERSIDE within the 3.16 and 3.18 versions (e.g. from 3.16.4 to 3.16.7 or from 3.18.1 to 3.18.3). Run the command and follow the instructions:
+### Within Docker bundle version
+No further steps are required to update ERP USERSIDE within the same Docker bundle version (for example, from 3.19.4 to 3.19.7 or from 3.21.1 to 3.21.3). Run the command and follow the instructions:
 ```
 bundle-update
 ```
 
+### Upgrade from Docker bundle version 3.19 to version 3.21
+> [!WARNING]
+> When upgrading from any other Docker bundle version to Docker bundle 3.21, you must back up the database and restore it after upgrading the bundle because the PostgreSQL version is different.
+
+#### Upgrade procedure
+Update the repository information and stop the Docker bundle.
+```shell
+sudo git fetch
+source alias.bash
+bundle-stop
+```
+
+If you cloned the repository from a branch other than master (for example, using the `--branch=v3.18` parameter), switch to branch `v3.21`.
+```shell
+git switch v3.21
+```
+If you cloned the repository without specifying a particular branch, just continue.
+
+Update the branch information and reconnect alias.bash to the shell:
+```shell
+sudo git pull
+source alias.bash
+```
+
+Edit your `compose.yaml` file and set Docker image versions according to the `compose.yaml-example` file (replace 3.19 or 3.20 with 3.21).
+
+For the `postgres` service, change the volume path from `/var/lib/postgresql/data` to `/var/lib/postgresql`.
+
+You can proceed with the upgrade. Run the update command and follow the instructions:
+```shell
+bundle-update
+```
+
+The upgrade is now complete.
+
 ### Upgrade from Docker bundle version 3.18 to version 3.19
-#### If you have bandle 3.16
+#### If you have bundle 3.16
 > [!WARNING] 
 > If you are upgrading from a version 3.16 bundle, it is obligatory to make a backup copy of the database and then restore it after the bundle upgrade, because the PostgreSQL version differs between the 3.16 and 3.18 bundles.
-> But if you have current bandle version 3.18, you don't need to do this - Postgres versions don't differ between 3.18 and 3.19.
+> If your current bundle version is 3.18, this is not required because the PostgreSQL version does not differ between bundles 3.18 and 3.19.
 
 #### Upgrade procedure
 Update the repository information and stop the Docker bundle from running.
@@ -541,7 +582,7 @@ Feedback, suggestions and bug reports about this Docker environment for USERSIDE
 
 ---
 
-# ERP USERSIDE Docker Bundle v3.19.3 (RU)
+# ERP USERSIDE Docker Bundle v3.21.0 (RU)
 
 ## О проекте
 Данный проект представляет собой **набор образцов** конфигурационных файлов и скриптов для запуска **Docker-бандла** системы ERP USERSIDE. Все необходимые для работы ERP USERSIDE образы уже собраны со всеми необходимыми зависимостями и настройками и размещены в [Docker HUB](https://hub.docker.com/repository/docker/erpuserside/userside). Вы можете на основе данных образцов собрать свой бандл, используя Docker [Compose](https://docs.docker.com/compose/) либо испльзуя другие, удобные вам, инструменты оркестрации. Вы также можете воспользоваться образцами как есть и получить работающую систему ERP USERSIDE без каких либо дополнительных действий. Мы полностью полагаемся на ваше понимание работы контейнеризации в Linux, работы Docker, Docker Compose, Swarm и других систем, которые вы собираетесь использовать.
@@ -565,7 +606,7 @@ sudo mkdir -p /docker && cd $_
 ```
 4. Склонируйте этот репозиторий в подкаталог userside и перейдитие в него:
 ```
-sudo git clone --depth 1 --branch=v3.19 https://github.com/userside/userside-docker.git userside && cd userside
+sudo git clone --depth 1 --branch=v3.21 https://github.com/userside/userside-docker.git userside && cd userside
 ```
 5. Выполните команду инициализации конфигов бандла — она создаст копии образцов с рабочими именами файлов. Теперь у вас есть файлы **.env**, **compose.yaml**, **bundle.bash**.
 ```
@@ -591,11 +632,46 @@ bundle-install
 
 ## Обновление
 
-### В пределах версий Docker-бандла 3.16, 3.18 или 3.19
-Для обновления ERP USERSIDE в пределах бандла версий 3.16 и 3.18 (например, с 3.16.4 на 3.16.7 или с 3.18.1 на 3.18.3) никаких дополнительных действий не требуется. Запустите команду и следуйте инструкциям:
+### В пределах версий Docker-бандла
+Для обновления ERP USERSIDE в пределах бандла (например, с 3.19.4 на 3.19.7 или с 3.21.1 на 3.21.3) никаких дополнительных действий не требуется. Запустите команду и следуйте инструкциям:
 ```
 bundle-update
 ```
+
+### Обновление с версии Docker-бандла 3.19 на версию 3.21
+> [!WARNING]
+> При обновлении с любой другой версии Docker-бандла на версию Docker-бандла 3.21 вам обязатепльно необходимо сделать резервную копию базы данных и затем ее восстановить после обнеовления бандла, так как версия PostgreSQL отличается.
+
+#### Процедура обновления
+Обновите информацию о репозитории и остановите работу Docker-бандла.
+```shell
+sudo git fetch
+source alias.bash
+bundle-stop
+```
+
+Если вы клонировали репозиторий с веткой, отличной от master (например используя параметр `--branch=v3.18`), то переключитесь на ветку `3.21`.
+```shell
+git switch v3.21
+```
+Если вы клонировали репозиторий без указания конкретной ветки, то просто продолжайте дальше.
+
+Обновите информацию из ветки и заново подключите alias.bash к оболочке:
+```shell
+sudo git pull
+source alias.bash
+```
+
+Отредактируйте ваш файл `compose.yaml` — укажите версии Docker-образов в соответствии с примером из `compose.yaml-example` (замените 3.19 или 3.20 на 3.21).
+
+Для службы `postgres` измените `volume` с `/var/lib/postgresql/data` на `/var/lib/postgresql`.
+
+Можно приступить к обновлению. Выполните команду обновления и следуйте инструкциям:
+```shell
+bundle-update
+```
+
+На этом обновление завершено.
 
 ### Обновление с версии Docker-бандла 3.18 на версию 3.19
 #### Если у вас версия бандла 3.16

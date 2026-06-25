@@ -88,9 +88,8 @@ rabbitmq-create-stomp-user () {
 }
 
 ## INSTALLER
-alias erp-install="${DOCKER_COMPOSE} run --rm php /app/userside_install.sh install"
-alias erp-repair="${DOCKER_COMPOSE} run --rm php /app/userside_install.sh repair"
-alias erp-stability="${DOCKER_COMPOSE} run --rm php /app/userside_install.sh config --stability=$1"
+alias erp-install="${DOCKER_COMPOSE} run --rm /app/installer install"
+alias erp-repair="${DOCKER_COMPOSE} run --rm /app/installer repair"
 
 ## USERSIDE COMMANDS
 alias erp-flush-cache="${DOCKER_COMPOSE} run --rm php php run cache/flush-all"
