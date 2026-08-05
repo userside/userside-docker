@@ -123,6 +123,42 @@ services:
       - "172.31.254.1:15672:15672" # RabbitMQ management
       - "172.31.254.1:15674:15674" # WebSTOMP (websocket)
 
+  # usm_billing:
+  #   image: erpuserside/usm_billing:latest
+  #   depends_on:
+  #     - nginx
+  #   environment:
+  #     # USERSIDE_API_URL: "" # It is not necessary if userside works in the same bundle
+  #     USERSIDE_API_KEY: ""
+  #     BILLING_NAME: ""
+  #     BILLING_URL: ""
+  #     BILLING_ID: ""
+  #     IS_DISABLE_CREATE_ADDRESS: 0 # Flag - Disable Create New Address Object (house, street etc) [0|1]
+  #     IS_SKIP_UPDATE_AGREEMENT_DATE: 0 # Flag - Is Skip Update Agreement Date
+  #     IS_SKIP_UPDATE_DATE_ACTIVITY: 0 # Flag - Is Skip Update Date Activity
+  #     IS_SKIP_DELETE_EMPTY_IP: 0 # Flag - Is Skip Delete Empty Ip
+  #     SKIP_DELETE_IP_LIST: "" # comma separated Diapazon Of Skipped Ip
+  #     IS_IMPORT_LESS_ADDRESS: 0 # Flag - Is Update Empty Customer Address
+  #     IS_IMPORT_LESS_PHONE: 0 # Flag - Is Update Empty Customer Phone
+  #     IS_UPDATE_EMPTY_LEVEL: 0 # Flag - Is Update Empty Customer Level
+  #     IS_UPDATE_EMPTY_ENTRANCE: 0 # Flag - Is Update Empty Customer Entrance
+  #     IS_SKIP_UNUSED_ADDRESS: 0 # Flag - Is Skip Unused Address
+  #     IS_USE_STREET_FULL_NAME: 0 # Flag - use the full name of the imported street (with suffix/prefix)
+  #     IS_IMPORT_MESSAGE: 0 # Flag - import customer messages (if posible)
+  #     ALWAYS_SET_CUSTOMER_GROUP_ID: "" # set the group ID for all imported customers
+  #     IS_REMOVE_EMPTY_GROUPS: 0 # Flag - Is Remove Empty Groups In ERP
+  #     IS_REMOVE_EMPTY_MARK_MERGE: 0 # Flag - Is Delete labels whose values do not match the following markMerge
+  #     IS_DO_NOT_UPDATE_ADD_PHONE: 0 # Flag - Is Skip Updata Additional Phones
+  #     IS_SKIP_SLASH_IN_NEW_BUILDING_NUMBER: 0 # Flag - Is Skip Slash In New Building Number
+  #   volumes:
+  #     - ${ERP_BASE_DIR}/data/log/usm_billing:/module/log
+  #     - ${ERP_BASE_DIR}/config/datetime.ini:/usr/local/etc/php/conf.d/timezone.ini
+  #     # - ${ERP_BASE_DIR}/config/usm_billing_config.php:/module/usm_billing_config.php
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - /etc/timezone:/etc/timezone:ro
+  #   networks:
+  #     - internal
+
 volumes:
   www:
     driver_opts:
