@@ -79,18 +79,15 @@ alias cron-run="${DOCKER_COMPOSE} run --rm php php run cron"
 ## RABBITMQ
 alias rabbitmqctl="${DOCKER_COMPOSE} exec rabbitmq rabbitmqctl $1"
 rabbitmq-create-stomp-user () {
-    read -p "WebSocket username: " -r STOMP_USER
-    read -p "WebSocket password: " -s -r STOMP_PASSWORD
-    rabbitmqctl add_user "${STOMP_USER}" "${STOMP_PASSWORD}"
-    rabbitmqctl set_permissions -p "/" "${STOMP_USER}" "^erp-stomp:id-.*" "" "^erp-stomp:id-.*"
+    rabbitmqctl add_user "${RABBITMQ_STOMP_USER}" "${RABBITMQ_STOMP_PASS}"
+    rabbitmqctl set_permissions -p "/" "${RABBITMQ_STOMP_USER}" "^erp-stomp:id-.*" "" "^erp-stomp:id-.*"
     echo
     echo "Done"
 }
 
 ## INSTALLER
-alias erp-install="${DOCKER_COMPOSE} run --rm php /app/userside_install.sh install"
-alias erp-repair="${DOCKER_COMPOSE} run --rm php /app/userside_install.sh repair"
-alias erp-stability="${DOCKER_COMPOSE} run --rm php /app/userside_install.sh config --stability=$1"
+alias erp-install="${DOCKER_COMPOSE} run --rm php ./installer install"
+alias erp-repair="${DOCKER_COMPOSE} run --rm php ./installer repair"
 
 ## USERSIDE COMMANDS
 alias erp-flush-cache="${DOCKER_COMPOSE} run --rm php php run cache/flush-all"
@@ -140,18 +137,28 @@ bundle-install () {
     sudo mkdir -p ${ERP_BASE_DIR}/data/userside/var/log/usm_billing
     sudo chmod -R u=rwX,g=rwX,o=rwX ${ERP_BASE_DIR}/data/userside/var ${ERP_BASE_DIR}/data/backup ${ERP_BASE_DIR}/data/log
 
-    test -f ${ERP_BASE_DIR}/data/userside/.env || echo "" | sudo tee ${ERP_BASE_DIR}/data/userside/.env > /dev/null
+    if [[ ! -f ${ERP_BASE_DIR}/data/userside/installer ]]; then
+        curl -fsSL https://my.userside.eu/install.sh | sudo INSTALL_PATH=${ERP_BASE_DIR}/data/userside/installer bash
+    fi
 
-    if [[ ! -f ${ERP_BASE_DIR}/data/userside/installer.json ]]; then
-        sudo tee ${ERP_BASE_DIR}/data/userside/installer.json > /dev/null <<EOT
-{
-  "pgsql_dsn": "pgsql:host=postgres;dbname=${POSTGRES_DB};port=5432;username=${POSTGRES_USER};password=${POSTGRES_PASSWORD}",
-  "redis_url": "redis://${REDIS_PASSWORD}@redis",
-  "rabbit_url": "amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672/%2f",
-  "stability": "stable"
-}
+    if [[ ! -f ${ERP_BASE_DIR}/data/userside/.env ]]; then
+        sudo tee ${ERP_BASE_DIR}/data/userside/.env > /dev/null <<EOT
+US_DB_DSN="pgsql:host=postgres;dbname=${POSTGRES_DB};port=5432"
+US_DB_USER=${POSTGRES_USER}
+US_DB_PASS=${POSTGRES_PASSWORD}
+US_REDIS_HOST=redis
+US_REDIS_PORT=6379
+US_REDIS_DB=0
+US_REDIS_PASSWORD=${REDIS_PASSWORD}
+US_AMQP_DSN="amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672/%2f"
+US_WSTOMP_USER=${RABBITMQ_STOMP_USER}
+US_WSTOMP_PASS=${RABBITMQ_STOMP_PASS}
 EOT
     fi
+
+    sudo chown 82:82 ${ERP_BASE_DIR}/data/userside/installer ${ERP_BASE_DIR}/data/userside/.env
+    sudo chmod 600 ${ERP_BASE_DIR}/data/userside/.env
+    sudo chmod 777 ${ERP_BASE_DIR}/data/userside/installer
 
     bundle-start || fail "Error"
     database-postgis-update > /dev/null || fail "Error"
