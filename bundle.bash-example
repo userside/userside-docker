@@ -86,8 +86,8 @@ rabbitmq-create-stomp-user () {
 }
 
 ## INSTALLER
-alias erp-install="${DOCKER_COMPOSE} run --rm ./installer install"
-alias erp-repair="${DOCKER_COMPOSE} run --rm ./installer repair"
+alias erp-install="${DOCKER_COMPOSE} run --rm php ./installer install"
+alias erp-repair="${DOCKER_COMPOSE} run --rm php ./installer repair"
 
 ## USERSIDE COMMANDS
 alias erp-flush-cache="${DOCKER_COMPOSE} run --rm php php run cache/flush-all"
@@ -138,7 +138,7 @@ bundle-install () {
     sudo chmod -R u=rwX,g=rwX,o=rwX ${ERP_BASE_DIR}/data/userside/var ${ERP_BASE_DIR}/data/backup ${ERP_BASE_DIR}/data/log
 
     if [[ ! -f ${ERP_BASE_DIR}/data/userside/installer ]]; then
-        curl -fsSL https://my.userside.eu/install.sh | INSTALL_PATH=${ERP_BASE_DIR}/data/userside/installer bash
+        curl -fsSL https://my.userside.eu/install.sh | sudo INSTALL_PATH=${ERP_BASE_DIR}/data/userside/installer bash
     fi
 
     if [[ ! -f ${ERP_BASE_DIR}/data/userside/.env ]]; then
@@ -155,6 +155,10 @@ US_WSTOMP_USER=${RABBITMQ_STOMP_USER}
 US_WSTOMP_PASS=${RABBITMQ_STOMP_PASS}
 EOT
     fi
+
+    sudo chown 82:82 ${ERP_BASE_DIR}/data/userside/installer ${ERP_BASE_DIR}/data/userside/.env
+    sudo chmod 600 ${ERP_BASE_DIR}/data/userside/.env
+    sudo chmod 777 ${ERP_BASE_DIR}/data/userside/installer
 
     bundle-start || fail "Error"
     database-postgis-update > /dev/null || fail "Error"
